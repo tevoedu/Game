@@ -1,0 +1,2951 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Módulo Cidade · World Building</title>
+    <style>
+        /* ============================
+                   CONFIG · RESET & BASE
+                   ============================ */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        :root {
+            --bg-primary: #0f0f12;
+            --bg-secondary: #191a1f;
+            --bg-card: #22242b;
+            --bg-input: #2c2e36;
+            --text-primary: #ece6d9;
+            --text-secondary: #b8ae9a;
+            --text-muted: #7a7262;
+            --gold: #c9a84c;
+            --gold-dim: #a8893a;
+            --blue-deep: #1a2b4a;
+            --blue-mid: #2a4a7a;
+            --beige: #d4c5a0;
+            --beige-dark: #b8a882;
+            --border-subtle: #33353e;
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            --radius: 10px;
+            --font-serif: 'Georgia', 'Times New Roman', serif;
+            --font-sans: 'Segoe UI', Roboto, system-ui, sans-serif;
+            --transition: 0.25s ease;
+        }
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            font-size: 16px;
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: var(--font-serif);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold-dim);
+            border-radius: 8px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold);
+        }
+        a,
+        button,
+        input,
+        textarea,
+        select {
+            font-family: inherit;
+            color: inherit;
+        }
+        button {
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+        img {
+            display: block;
+            max-width: 100%;
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* ============================
+                   SIDEBAR
+                   ============================ */
+        .sidebar {
+            width: 220px;
+            min-width: 220px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-subtle);
+            padding: 28px 16px 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow-y: auto;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        .sidebar-brand {
+            font-size: 1.1rem;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+            color: var(--gold);
+            text-transform: uppercase;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 24px;
+            font-family: var(--font-sans);
+        }
+        .sidebar-brand small {
+            display: block;
+            font-weight: 400;
+            font-size: 0.65rem;
+            color: var(--text-muted);
+            letter-spacing: 0.12em;
+            margin-top: 4px;
+            text-transform: none;
+        }
+        .nav-list {
+            list-style: none;
+            flex: 1;
+        }
+        .nav-list li {
+            margin-bottom: 4px;
+        }
+        .nav-list button {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            font-family: var(--font-sans);
+            color: var(--text-secondary);
+            transition: var(--transition);
+            text-align: left;
+            border: 1px solid transparent;
+        }
+        .nav-list button:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .nav-list button.active {
+            background: var(--blue-deep);
+            color: var(--gold);
+            border-color: var(--gold-dim);
+            box-shadow: 0 0 20px rgba(201, 168, 76, 0.06);
+        }
+        .nav-list .nav-icon {
+            font-size: 1.1rem;
+            width: 24px;
+            text-align: center;
+        }
+        .sidebar-footer {
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border-subtle);
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            letter-spacing: 0.04em;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .sidebar-footer .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            background: #4caf50;
+            border-radius: 50%;
+            margin-right: 6px;
+            animation: pulse-dot 2s infinite;
+        }
+        @keyframes pulse-dot {
+            0%,
+            100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+        }
+        .sidebar-footer .backup-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 4px;
+        }
+        .sidebar-footer .backup-actions button {
+            font-size: 0.65rem;
+            padding: 4px 10px;
+            border-radius: 20px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            transition: var(--transition);
+            font-family: var(--font-sans);
+        }
+        .sidebar-footer .backup-actions button:hover {
+            background: var(--gold-dim);
+            color: #0f0f12;
+            border-color: var(--gold-dim);
+        }
+
+        /* ============================
+                   MAIN CONTENT
+                   ============================ */
+        .main {
+            flex: 1;
+            height: 100vh;
+            overflow-y: auto;
+            padding: 32px 40px 60px;
+            background: var(--bg-primary);
+        }
+        .section {
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+        .section.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-family: var(--font-serif);
+        }
+        .section-sub {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            margin-bottom: 28px;
+            border-left: 2px solid var(--gold-dim);
+            padding-left: 16px;
+        }
+
+        /* ============================
+                   CARDS & UI
+                   ============================ */
+        .card-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 18px;
+            margin: 20px 0 30px;
+        }
+        .card {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 18px 20px 20px;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition);
+            position: relative;
+        }
+        .card:hover {
+            border-color: var(--gold-dim);
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.3);
+        }
+        .card-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            font-weight: 600;
+        }
+        .card-value {
+            font-size: 1rem;
+            margin-top: 4px;
+            font-weight: 500;
+            color: var(--text-primary);
+            word-break: break-word;
+        }
+        .card-value.editable {
+            cursor: text;
+            border-bottom: 1px dashed transparent;
+            transition: var(--transition);
+        }
+        .card-value.editable:hover {
+            border-bottom-color: var(--gold-dim);
+        }
+        .card-value.editable:focus {
+            outline: none;
+            border-bottom-color: var(--gold);
+            background: var(--bg-input);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        .btn-gold {
+            background: var(--gold-dim);
+            color: #0f0f12;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            transition: var(--transition);
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-gold:hover {
+            background: var(--gold);
+            transform: scale(1.02);
+            box-shadow: 0 4px 20px rgba(201, 168, 76, 0.25);
+        }
+        .btn-gold-outline {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid var(--gold-dim);
+            padding: 8px 20px;
+            border-radius: 30px;
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .btn-gold-outline:hover {
+            background: var(--gold-dim);
+            color: #0f0f12;
+        }
+        .btn-sm {
+            padding: 4px 14px;
+            font-size: 0.7rem;
+        }
+
+        .input-dark {
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            border-radius: 6px;
+            padding: 8px 12px;
+            color: var(--text-primary);
+            width: 100%;
+            font-size: 0.9rem;
+            transition: var(--transition);
+            font-family: var(--font-sans);
+        }
+        .input-dark:focus {
+            outline: none;
+            border-color: var(--gold-dim);
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+        }
+        textarea.input-dark {
+            min-height: 70px;
+            resize: vertical;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(4px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            padding: 20px;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+        .modal-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius);
+            max-width: 780px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 28px 32px 32px;
+            box-shadow: var(--shadow);
+            animation: modalIn 0.25s ease;
+        }
+        @keyframes modalIn {
+            0% {
+                opacity: 0;
+                transform: scale(0.96) translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+        .modal-box .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .modal-box .modal-header h3 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--gold);
+        }
+        .modal-close {
+            font-size: 1.4rem;
+            color: var(--text-muted);
+            padding: 4px 10px;
+            border-radius: 30px;
+            transition: var(--transition);
+        }
+        .modal-close:hover {
+            background: var(--bg-card);
+            color: var(--text-primary);
+        }
+        .modal-box .form-group {
+            margin-bottom: 16px;
+        }
+        .modal-box .form-group label {
+            display: block;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .modal-box .image-preview-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 8px;
+        }
+        .modal-box .image-preview-grid .img-thumb {
+            aspect-ratio: 1/1;
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-input);
+            position: relative;
+        }
+        .modal-box .image-preview-grid .img-thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .modal-box .image-preview-grid .img-thumb .remove-img {
+            position: absolute;
+            top: 2px;
+            right: 2px;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .modal-box .image-preview-grid .img-thumb .remove-img:hover {
+            background: #8b2a2a;
+        }
+
+        /* ============================
+                   HERO · VISÃO GERAL
+                   ============================ */
+        .hero-city {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-subtle);
+            padding: 28px 32px 32px;
+            margin-bottom: 30px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            align-items: flex-start;
+            position: relative;
+            overflow: hidden;
+        }
+        .hero-city::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 20% 30%, rgba(26, 43, 74, 0.3), transparent 70%);
+            pointer-events: none;
+        }
+        .hero-image {
+            width: 200px;
+            min-height: 140px;
+            background: var(--bg-input);
+            border-radius: 8px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            cursor: pointer;
+        }
+        .hero-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .hero-image .placeholder {
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            font-family: var(--font-sans);
+            text-align: center;
+            padding: 10px;
+        }
+        .hero-content {
+            flex: 1;
+            min-width: 200px;
+        }
+        .hero-content .city-name {
+            font-size: 2.4rem;
+            font-weight: 700;
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+        .hero-content .city-nick {
+            font-size: 1.1rem;
+            color: var(--gold);
+            font-style: italic;
+            margin-bottom: 8px;
+        }
+        .hero-content .city-tagline {
+            font-size: 0.95rem;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            border-left: 2px solid var(--gold-dim);
+            padding-left: 14px;
+            margin: 10px 0 12px;
+        }
+        .hero-content .city-location {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+        }
+        .hero-content .city-location span {
+            color: var(--text-secondary);
+        }
+
+        /* galeria mini */
+        .gallery-mini {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .gallery-mini .item {
+            background: var(--bg-card);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            aspect-ratio: 4/3;
+        }
+        .gallery-mini .item:hover {
+            border-color: var(--gold-dim);
+            transform: scale(1.01);
+        }
+        .gallery-mini .item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-mini .item .caption {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 6px 10px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+            font-size: 0.7rem;
+            color: #eee;
+            font-family: var(--font-sans);
+        }
+
+        /* ============================
+                   MAPA
+                   ============================ */
+        .map-container {
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            position: relative;
+            margin: 16px 0 20px;
+        }
+        .map-wrapper {
+            position: relative;
+            width: 100%;
+            height: 520px;
+            overflow: hidden;
+            background: #14161c;
+            cursor: grab;
+            user-select: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .map-wrapper:active {
+            cursor: grabbing;
+        }
+        .map-inner {
+            position: relative;
+            transform-origin: 0 0;
+            flex-shrink: 0;
+        }
+        .map-inner .map-image {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            pointer-events: none;
+        }
+        .map-inner .map-placeholder {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            gap: 10px;
+            pointer-events: none;
+        }
+        .map-inner .map-placeholder .icon-big {
+            font-size: 3rem;
+            opacity: 0.3;
+        }
+        .map-inner .map-placeholder span {
+            font-size: 0.9rem;
+        }
+
+        /* marcadores */
+        .map-marker {
+            position: absolute;
+            transform: translate(-50%, -50%);
+            width: 28px;
+            height: 28px;
+            background: var(--gold);
+            border-radius: 50% 50% 50% 0;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            box-shadow: 0 2px 12px rgba(201, 168, 76, 0.5);
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 5;
+            border: 2px solid #0f0f12;
+        }
+        .map-marker::after {
+            content: '';
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background: #0f0f12;
+            border-radius: 50%;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .map-marker:hover {
+            transform: translate(-50%, -50%) rotate(-45deg) scale(1.2);
+            box-shadow: 0 4px 24px rgba(201, 168, 76, 0.7);
+            z-index: 10;
+        }
+        .map-marker .label {
+            position: absolute;
+            top: -28px;
+            left: 50%;
+            transform: translateX(-50%) rotate(45deg);
+            background: rgba(15, 15, 18, 0.85);
+            color: var(--text-primary);
+            padding: 2px 10px;
+            border-radius: 4px;
+            font-size: 0.6rem;
+            font-family: var(--font-sans);
+            white-space: nowrap;
+            border: 1px solid var(--gold-dim);
+            pointer-events: none;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .map-marker:hover .label {
+            opacity: 1;
+        }
+
+        .map-controls {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-subtle);
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .map-controls .btn-group {
+            display: flex;
+            gap: 6px;
+        }
+        .map-controls .btn-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 30px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            font-size: 1rem;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .map-controls .btn-icon:hover {
+            background: var(--gold-dim);
+            color: #0f0f12;
+            border-color: var(--gold-dim);
+        }
+        .map-controls .file-upload-wrap {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .map-controls .file-upload-wrap input[type="file"] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+
+        /* ============================
+                   LOCAIS / RUAS / TIMELINE
+                   ============================ */
+        .list-item {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            padding: 16px 20px;
+            border: 1px solid var(--border-subtle);
+            margin-bottom: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            transition: var(--transition);
+            gap: 12px;
+        }
+        .list-item:hover {
+            border-color: var(--gold-dim);
+        }
+        .list-item .info {
+            flex: 1;
+            min-width: 140px;
+        }
+        .list-item .info .name {
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        .list-item .info .sub {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+        }
+        .list-item .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .list-item .actions button {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-family: var(--font-sans);
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition);
+            background: var(--bg-input);
+            color: var(--text-secondary);
+        }
+        .list-item .actions button:hover {
+            background: var(--gold-dim);
+            color: #0f0f12;
+            border-color: var(--gold-dim);
+        }
+        .list-item .actions button.danger:hover {
+            background: #8b2a2a;
+            border-color: #8b2a2a;
+            color: #fff;
+        }
+        .list-item .thumb {
+            width: 50px;
+            height: 50px;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+            border: 1px solid var(--border-subtle);
+            background: var(--bg-input);
+        }
+        .list-item .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .empty-state {
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        /* ============================
+                   TIMELINE
+                   ============================ */
+        .timeline {
+            position: relative;
+            padding-left: 32px;
+            margin: 20px 0;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 10px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--gold-dim);
+        }
+        .timeline-item {
+            position: relative;
+            margin-bottom: 24px;
+            padding-left: 20px;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -26px;
+            top: 6px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--bg-primary);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+        .timeline-item .date {
+            font-size: 0.75rem;
+            color: var(--gold);
+            font-family: var(--font-sans);
+            font-weight: 600;
+            letter-spacing: 0.04em;
+        }
+        .timeline-item .title {
+            font-weight: 600;
+            font-size: 1rem;
+            margin: 2px 0 4px;
+        }
+        .timeline-item .desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+        }
+        .timeline-item .img-thumb {
+            margin-top: 8px;
+            max-width: 160px;
+            border-radius: 6px;
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+        }
+        .timeline-item .img-thumb img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* ============================
+                   GALERIA
+                   ============================ */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 16px;
+            margin: 16px 0;
+        }
+        .gallery-grid .g-item {
+            background: var(--bg-card);
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--border-subtle);
+            transition: var(--transition);
+            cursor: pointer;
+            aspect-ratio: 1/1;
+            position: relative;
+        }
+        .gallery-grid .g-item:hover {
+            border-color: var(--gold-dim);
+            transform: scale(1.02);
+            z-index: 2;
+        }
+        .gallery-grid .g-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .gallery-grid .g-item .overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 8px 12px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+            color: #eee;
+            font-size: 0.75rem;
+            font-family: var(--font-sans);
+        }
+        .gallery-grid .g-item .overlay .tag {
+            display: inline-block;
+            background: var(--gold-dim);
+            color: #0f0f12;
+            padding: 0 8px;
+            border-radius: 10px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            margin-left: 6px;
+        }
+
+        /* filtros galeria */
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 16px;
+        }
+        .filter-bar .filter-btn {
+            padding: 4px 16px;
+            border-radius: 30px;
+            background: var(--bg-input);
+            border: 1px solid var(--border-subtle);
+            font-size: 0.75rem;
+            font-family: var(--font-sans);
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .filter-bar .filter-btn:hover,
+        .filter-bar .filter-btn.active {
+            background: var(--gold-dim);
+            color: #0f0f12;
+            border-color: var(--gold-dim);
+        }
+
+        /* lightbox da galeria (slideshow) */
+        .lightbox-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            padding: 20px;
+        }
+        .lightbox-overlay.open {
+            display: flex;
+        }
+        .lightbox-content {
+            max-width: 1000px;
+            width: 100%;
+            max-height: 90vh;
+            background: var(--bg-secondary);
+            border-radius: var(--radius);
+            border: 1px solid var(--border-subtle);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        .lightbox-content .lb-image-wrap {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0c;
+            min-height: 300px;
+            position: relative;
+        }
+        .lightbox-content .lb-image-wrap img {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            transition: opacity 0.3s ease;
+        }
+        .lightbox-content .lb-info {
+            padding: 16px 24px 20px;
+            background: var(--bg-card);
+            border-top: 1px solid var(--border-subtle);
+        }
+        .lightbox-content .lb-info .lb-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+        }
+        .lightbox-content .lb-info .lb-desc {
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 0.9rem;
+            margin-top: 4px;
+        }
+        .lightbox-content .lb-info .lb-meta {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            font-family: var(--font-sans);
+            margin-top: 6px;
+        }
+        .lightbox-content .lb-counter {
+            position: absolute;
+            bottom: 12px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.6);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-family: var(--font-sans);
+        }
+        .lightbox-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            width: 44px;
+            height: 44px;
+            font-size: 1.6rem;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .lightbox-nav:hover {
+            background: var(--gold-dim);
+            color: #0f0f12;
+        }
+        .lightbox-nav.prev {
+            left: 12px;
+        }
+        .lightbox-nav.next {
+            right: 12px;
+        }
+        .lightbox-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.8rem;
+            color: #fff;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 30px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: var(--transition);
+            z-index: 6;
+            border: none;
+        }
+        .lightbox-close:hover {
+            background: #8b2a2a;
+        }
+
+        /* ============================
+                   RESPONSIVO
+                   ============================ */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 180px;
+                min-width: 180px;
+                padding: 20px 12px;
+            }
+            .main {
+                padding: 24px 24px 40px;
+            }
+        }
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+                overflow: auto;
+            }
+            .sidebar {
+                width: 100%;
+                min-width: unset;
+                height: auto;
+                flex-direction: row;
+                flex-wrap: wrap;
+                padding: 12px 16px;
+                border-right: none;
+                border-bottom: 1px solid var(--border-subtle);
+                position: sticky;
+                top: 0;
+                z-index: 20;
+                background: var(--bg-secondary);
+                gap: 4px;
+            }
+            .sidebar-brand {
+                padding: 0 12px 0 0;
+                border-bottom: none;
+                margin: 0;
+                font-size: 0.9rem;
+                flex: 1;
+            }
+            .sidebar-brand small {
+                display: none;
+            }
+            .nav-list {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 4px;
+                flex: 1;
+                justify-content: flex-end;
+            }
+            .nav-list li {
+                margin: 0;
+            }
+            .nav-list button {
+                padding: 6px 12px;
+                font-size: 0.7rem;
+                gap: 4px;
+                border-radius: 20px;
+                white-space: nowrap;
+            }
+            .nav-list .nav-icon {
+                font-size: 0.9rem;
+                width: auto;
+            }
+            .sidebar-footer {
+                display: none;
+            }
+            .main {
+                height: auto;
+                padding: 20px 16px 40px;
+                overflow: visible;
+            }
+            .hero-city {
+                flex-direction: column;
+                padding: 20px;
+            }
+            .hero-image {
+                width: 100%;
+                min-height: 120px;
+            }
+            .hero-content .city-name {
+                font-size: 1.8rem;
+            }
+            .map-wrapper {
+                height: 320px;
+            }
+            .card-grid {
+                grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            }
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            .modal-box {
+                padding: 20px;
+                margin: 10px;
+            }
+            .lightbox-content .lb-image-wrap {
+                min-height: 200px;
+            }
+            .lightbox-content .lb-image-wrap img {
+                max-height: 50vh;
+            }
+            .lightbox-nav {
+                width: 36px;
+                height: 36px;
+                font-size: 1.2rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .sidebar {
+                padding: 8px 10px;
+                gap: 2px;
+            }
+            .nav-list button {
+                font-size: 0.6rem;
+                padding: 4px 10px;
+            }
+            .nav-list .nav-icon {
+                font-size: 0.75rem;
+            }
+            .hero-content .city-name {
+                font-size: 1.4rem;
+            }
+            .map-wrapper {
+                height: 240px;
+            }
+            .card-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .gallery-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .main {
+                padding: 14px 12px 30px;
+            }
+        }
+
+        /* ============================
+                   UTILITÁRIOS
+                   ============================ */
+        .flex-between {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+        .mt-8 {
+            margin-top: 8px;
+        }
+        .mb-8 {
+            margin-bottom: 8px;
+        }
+        .gap-8 {
+            gap: 8px;
+        }
+        .text-gold {
+            color: var(--gold);
+        }
+        .text-muted {
+            color: var(--text-muted);
+        }
+        .text-sm {
+            font-size: 0.85rem;
+        }
+        .font-sans {
+            font-family: var(--font-sans);
+        }
+        .w-full {
+            width: 100%;
+        }
+        .flex-center {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mt-4 {
+            margin-top: 4px;
+        }
+        .mb-4 {
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    SIDEBAR
+    ============================================================ -->
+    <aside class="sidebar" role="navigation">
+        <div class="sidebar-brand">
+            🏛️ Cidade
+            <small>world building · módulo</small>
+        </div>
+        <ul class="nav-list">
+            <li><button class="active" data-section="visao-geral"><span class="nav-icon">📋</span> Visão Geral</button></li>
+            <li><button data-section="historia"><span class="nav-icon">📜</span> História</button></li>
+            <li><button data-section="mapa"><span class="nav-icon">🗺️</span> Mapa</button></li>
+            <li><button data-section="locais"><span class="nav-icon">📍</span> Locais</button></li>
+            <li><button data-section="ruas"><span class="nav-icon">🏘️</span> Ruas</button></li>
+            <li><button data-section="timeline"><span class="nav-icon">⏳</span> Linha do Tempo</button></li>
+            <li><button data-section="galeria"><span class="nav-icon">🖼️</span> Galeria</button></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div><span class="status-dot"></span> auto-salvo</div>
+            <div class="backup-actions">
+                <button id="btn-export-backup">💾 Exportar</button>
+                <button id="btn-import-backup">📂 Importar</button>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ============================================================
+    MAIN
+    ============================================================ -->
+    <main class="main" id="app">
+
+        <!-- ==================== VISÃO GERAL ==================== -->
+        <section id="visao-geral" class="section active">
+            <h2 class="section-title">Visão Geral da Cidade</h2>
+            <div class="section-sub">A fachada do seu mundo — edite cada detalhe.</div>
+
+            <!-- Hero -->
+            <div class="hero-city" id="hero-container">
+                <div class="hero-image" id="hero-image" title="Clique para alterar a imagem principal">
+                    <img id="hero-img" src="" alt="Imagem da cidade" style="display:none;" />
+                    <div class="placeholder" id="hero-placeholder">➕<br />Imagem principal</div>
+                </div>
+                <div class="hero-content">
+                    <div class="city-name" contenteditable="true" id="city-name">Cidade Costeira</div>
+                    <div class="city-nick" contenteditable="true" id="city-nick">"A Pérola do Litoral"</div>
+                    <div class="city-tagline" contenteditable="true" id="city-tagline">"Uma pequena cidade costeira onde antigas histórias continuam enterradas."</div>
+                    <div class="city-location">📍 <span contenteditable="true" id="city-location">Costa Sul, entre montanhas e o mar</span></div>
+                </div>
+            </div>
+
+            <!-- Cards info -->
+            <div class="card-grid" id="info-cards"></div>
+
+            <!-- Galeria mini -->
+            <div class="flex-between">
+                <h3 style="font-size:1.1rem;font-weight:500;">Galeria da Cidade</h3>
+                <button class="btn-gold-outline btn-sm" id="add-gallery-item">+ Adicionar imagem</button>
+            </div>
+            <div class="gallery-mini" id="gallery-mini"></div>
+        </section>
+
+        <!-- ==================== HISTÓRIA ==================== -->
+        <section id="historia" class="section">
+            <h2 class="section-title">História da Cidade</h2>
+            <div class="section-sub">A alma da cidade — origens, segredos e cultura.</div>
+
+            <div id="historia-blocks"></div>
+            <button class="btn-gold-outline btn-sm mt-8" id="add-historia-block">+ Adicionar bloco</button>
+        </section>
+
+        <!-- ==================== MAPA ==================== -->
+        <section id="mapa" class="section">
+            <h2 class="section-title">Mapa da Cidade</h2>
+            <div class="section-sub">Carregue o mapa e adicione marcadores nos locais importantes.</div>
+
+            <div class="map-container">
+                <div class="map-wrapper" id="map-wrapper">
+                    <div class="map-inner" id="map-inner">
+                        <img class="map-image" id="map-image" src="" alt="Mapa" style="display:none;" />
+                        <div class="map-placeholder" id="map-placeholder">
+                            <div class="icon-big">🗺️</div>
+                            <span>Carregue um mapa da cidade</span>
+                        </div>
+                        <!-- marcadores serão injetados aqui -->
+                    </div>
+                </div>
+                <div class="map-controls">
+                    <div class="btn-group">
+                        <button class="btn-icon" id="map-zoom-in" title="Zoom +">＋</button>
+                        <button class="btn-icon" id="map-zoom-out" title="Zoom -">−</button>
+                        <button class="btn-icon" id="map-reset" title="Resetar">⟲</button>
+                    </div>
+                    <button class="btn-gold btn-sm" id="btn-add-marker">📍 Adicionar marcador</button>
+                    <div class="file-upload-wrap">
+                        <button class="btn-gold-outline btn-sm">⬆️ Carregar mapa</button>
+                        <input type="file" id="map-upload" accept="image/png,image/jpeg,image/webp" />
+                    </div>
+                    <span style="font-size:0.7rem;color:var(--text-muted);margin-left:auto;" id="marker-count">0 marcadores</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== LOCAIS ==================== -->
+        <section id="locais" class="section">
+            <h2 class="section-title">Locais</h2>
+            <div class="section-sub">Cada marcador no mapa gera um local. Gerencie todos aqui.</div>
+            <div id="locais-list"></div>
+            <div class="empty-state" id="locais-empty">Nenhum local cadastrado. Adicione marcadores no mapa.</div>
+        </section>
+
+        <!-- ==================== RUAS ==================== -->
+        <section id="ruas" class="section">
+            <h2 class="section-title">Ruas e Endereços</h2>
+            <div class="section-sub">A identidade urbana — ruas, avenidas, becos e praças.</div>
+            <div class="flex-between mb-8">
+                <span></span>
+                <button class="btn-gold btn-sm" id="add-rua">+ Nova rua</button>
+            </div>
+            <div id="ruas-list"></div>
+            <div class="empty-state" id="ruas-empty">Nenhuma rua cadastrada.</div>
+        </section>
+
+        <!-- ==================== TIMELINE ==================== -->
+        <section id="timeline" class="section">
+            <h2 class="section-title">Linha do Tempo</h2>
+            <div class="section-sub">Os eventos que marcaram a cidade.</div>
+            <div class="flex-between mb-8">
+                <span></span>
+                <button class="btn-gold btn-sm" id="add-timeline-event">+ Novo evento</button>
+            </div>
+            <div class="timeline" id="timeline-container"></div>
+            <div class="empty-state" id="timeline-empty">Nenhum evento registrado.</div>
+        </section>
+
+        <!-- ==================== GALERIA ==================== -->
+        <section id="galeria" class="section">
+            <h2 class="section-title">Galeria</h2>
+            <div class="section-sub">Imagens, referências e concept art da cidade.</div>
+            <div class="filter-bar" id="gallery-filters">
+                <button class="filter-btn active" data-filter="todos">Todos</button>
+                <button class="filter-btn" data-filter="cidade">Cidade</button>
+                <button class="filter-btn" data-filter="ruas">Ruas</button>
+                <button class="filter-btn" data-filter="arquitetura">Arquitetura</button>
+                <button class="filter-btn" data-filter="locais">Locais</button>
+                <button class="filter-btn" data-filter="interiores">Interiores</button>
+                <button class="filter-btn" data-filter="natureza">Natureza</button>
+                <button class="filter-btn" data-filter="costa">Costa</button>
+                <button class="filter-btn" data-filter="objetos">Objetos</button>
+                <button class="filter-btn" data-filter="referencias">Referências</button>
+            </div>
+            <div class="flex-between mb-8">
+                <span></span>
+                <button class="btn-gold btn-sm" id="add-galeria-item">+ Adicionar item</button>
+            </div>
+            <div class="gallery-grid" id="gallery-grid"></div>
+            <div class="empty-state" id="gallery-empty">Nenhum item na galeria.</div>
+        </section>
+
+    </main>
+
+    <!-- ============================================================
+    MODAL GENÉRICO
+    ============================================================ -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal-box" id="modal-box">
+            <div class="modal-header">
+                <h3 id="modal-title">Título</h3>
+                <button class="modal-close" id="modal-close">✕</button>
+            </div>
+            <div id="modal-body"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    LIGHTBOX (slideshow)
+    ============================================================ -->
+    <div class="lightbox-overlay" id="lightbox-overlay">
+        <div class="lightbox-content">
+            <button class="lightbox-close" id="lightbox-close">✕</button>
+            <button class="lightbox-nav prev" id="lightbox-prev">‹</button>
+            <button class="lightbox-nav next" id="lightbox-next">›</button>
+            <div class="lb-image-wrap" id="lb-image-wrap">
+                <img id="lb-image" src="" alt="" />
+                <div class="lb-counter" id="lb-counter">1 / 1</div>
+            </div>
+            <div class="lb-info">
+                <div class="lb-title" id="lb-title">Título</div>
+                <div class="lb-desc" id="lb-desc">Descrição</div>
+                <div class="lb-meta" id="lb-meta">Categoria · Tags</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+    JAVASCRIPT
+    ============================================================ -->
+    <script>
+        (function() {
+            'use strict';
+
+            // ============================
+            // CONFIG
+            // ============================
+            const STORAGE_KEY = 'cidade_module_data';
+            const DEFAULT_DATA = {
+                hero: {
+                    image: '',
+                    name: 'Cidade Costeira',
+                    nick: '"A Pérola do Litoral"',
+                    tagline: '"Uma pequena cidade costeira onde antigas histórias continuam enterradas."',
+                    location: 'Costa Sul, entre montanhas e o mar'
+                },
+                infoCards: [
+                    { label: 'População', value: '12.400' },
+                    { label: 'Fundação', value: '1876' },
+                    { label: 'Localização', value: 'Litoral Sul' },
+                    { label: 'Clima', value: 'Temperado, úmido' },
+                    { label: 'Economia', value: 'Pesca, turismo' },
+                    { label: 'Cultura', value: 'Folclore marítimo' },
+                    { label: 'Arquitetura', value: 'Colonial, casas de pescadores' },
+                    { label: 'Atividades', value: 'Navegação, caminhadas' },
+                    { label: 'Características', value: 'Farol, grutas, neblina' }
+                ],
+                galleryMini: [],
+                historiaBlocks: [
+                    { title: 'Origem', content: 'A cidade surgiu como um pequeno povoado de pescadores no final do século XIX.' },
+                    { title: 'Fundação', content: 'Fundada por imigrantes europeus em 1876, às margens de uma enseada protegida.' },
+                    { title: 'Desenvolvimento', content: 'Cresceu com a construção do cais e da estrada de ferro, tornando-se um porto regional.' },
+                    { title: 'Grandes acontecimentos', content: 'O naufrágio do "Estrela do Mar" em 1924 e o grande incêndio de 1951.' },
+                    { title: 'Segredos', content: 'Dizem que túneis secretos conectam o farol à antiga igreja.' },
+                    { title: 'Cultura', content: 'Festa de Nossa Senhora dos Navegantes e o tradicional "Canto das Sereias".' }
+                ],
+                markers: [],
+                locais: [],
+                ruas: [],
+                timeline: [],
+                galeria: [],
+                mapImage: '',
+                mapImageWidth: 0,
+                mapImageHeight: 0
+            };
+
+            // ============================
+            // ESTADO
+            // ============================
+            let data = loadData();
+            let currentSection = 'visao-geral';
+            let mapState = {
+                scale: 1,
+                panX: 0,
+                panY: 0,
+                isDragging: false,
+                startX: 0,
+                startY: 0,
+                originX: 0,
+                originY: 0
+            };
+            let isAddingMarker = false;
+            let markerIdCounter = data.markers.length ? Math.max(...data.markers.map(m => m.id || 0)) + 1 : 1;
+            let localIdCounter = data.locais.length ? Math.max(...data.locais.map(l => l.id || 0)) + 1 : 1;
+            let ruaIdCounter = data.ruas.length ? Math.max(...data.ruas.map(r => r.id || 0)) + 1 : 1;
+            let timelineIdCounter = data.timeline.length ? Math.max(...data.timeline.map(t => t.id || 0)) + 1 : 1;
+            let galeriaIdCounter = data.galeria.length ? Math.max(...data.galeria.map(g => g.id || 0)) + 1 : 1;
+
+            // estado do lightbox
+            let lbItems = [];
+            let lbCurrentIndex = 0;
+
+            // ============================
+            // ARMAZENAMENTO
+            // ============================
+            function loadData() {
+                try {
+                    const raw = localStorage.getItem(STORAGE_KEY);
+                    if (raw) {
+                        const parsed = JSON.parse(raw);
+                        // migração: garantir que locais tenham 'imagens' e 'imagemPrincipal'
+                        if (parsed.locais) {
+                            parsed.locais = parsed.locais.map(l => {
+                                // se tiver 'images' (antigo), migrar para 'imagens'
+                                if (l.images && !l.imagens) {
+                                    l.imagens = l.images;
+                                    delete l.images;
+                                }
+                                if (!l.imagens) l.imagens = [];
+                                if (!l.imagemPrincipal) l.imagemPrincipal = '';
+                                return l;
+                            });
+                        }
+                        // migração: ruas terem 'imagens' e 'imagemPrincipal'
+                        if (parsed.ruas) {
+                            parsed.ruas = parsed.ruas.map(r => {
+                                if (!r.imagens) r.imagens = [];
+                                if (!r.imagemPrincipal) r.imagemPrincipal = r.image || '';
+                                delete r.image; // remove antigo campo único
+                                return r;
+                            });
+                        }
+                        // migração: galeria ter 'imagens' e 'imagemPrincipal'
+                        if (parsed.galeria) {
+                            parsed.galeria = parsed.galeria.map(g => {
+                                if (!g.imagens) g.imagens = [];
+                                if (!g.imagemPrincipal) g.imagemPrincipal = g.image || '';
+                                delete g.image;
+                                return g;
+                            });
+                        }
+                        return deepMerge(DEFAULT_DATA, parsed);
+                    }
+                } catch (e) { /* ignora */ }
+                return JSON.parse(JSON.stringify(DEFAULT_DATA));
+            }
+
+            function saveData() {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+                    if (window.hub && typeof window.hub.set === 'function') {
+                        window.hub.set('cidade_data', data);
+                    }
+                } catch (e) { /* ignora */ }
+            }
+
+            function deepMerge(target, source) {
+                const result = { ...target };
+                for (const key in source) {
+                    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                        result[key] = deepMerge(target[key] || {}, source[key]);
+                    } else {
+                        result[key] = source[key];
+                    }
+                }
+                return result;
+            }
+
+            // ============================
+            // UTILITÁRIOS
+            // ============================
+            function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+
+            function clamp(v, min, max) { return Math.min(Math.max(v, min), max); }
+
+            function toBase64(file) {
+                return new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = (e) => resolve(e.target.result);
+                    reader.readAsDataURL(file);
+                });
+            }
+
+            function openModal(title, html) {
+                document.getElementById('modal-title').textContent = title;
+                document.getElementById('modal-body').innerHTML = html;
+                document.getElementById('modal-overlay').classList.add('open');
+            }
+
+            function closeModal() {
+                document.getElementById('modal-overlay').classList.remove('open');
+            }
+
+            // ============================
+            // RENDERIZAÇÃO
+            // ============================
+
+            // --- VISÃO GERAL ---
+            function renderVisaoGeral() {
+                const h = data.hero;
+                document.getElementById('city-name').textContent = h.name;
+                document.getElementById('city-nick').textContent = h.nick;
+                document.getElementById('city-tagline').textContent = h.tagline;
+                document.getElementById('city-location').textContent = h.location;
+                const img = document.getElementById('hero-img');
+                const placeholder = document.getElementById('hero-placeholder');
+                if (h.image) {
+                    img.src = h.image;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                } else {
+                    img.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                }
+                const container = document.getElementById('info-cards');
+                container.innerHTML = data.infoCards.map((c, idx) =>
+                    `<div class="card">
+                        <div class="card-label">${c.label}</div>
+                        <div class="card-value editable" contenteditable="true" data-card-index="${idx}" data-field="value">${c.value}</div>
+                    </div>`
+                ).join('');
+
+                const mini = document.getElementById('gallery-mini');
+                if (data.galleryMini.length === 0) {
+                    mini.innerHTML = '<div class="empty-state" style="grid-column:1/-1;padding:10px;">Nenhuma imagem na galeria rápida.</div>';
+                } else {
+                    mini.innerHTML = data.galleryMini.map((item, idx) =>
+                        `<div class="item" data-idx="${idx}">
+                            <img src="${item.image}" alt="${item.title}" />
+                            <div class="caption">${item.title || 'Sem título'}</div>
+                        </div>`
+                    ).join('');
+                }
+            }
+
+            // --- HISTÓRIA ---
+            function renderHistoria() {
+                const container = document.getElementById('historia-blocks');
+                if (data.historiaBlocks.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Nenhum bloco de história adicionado.</div>';
+                } else {
+                    container.innerHTML = data.historiaBlocks.map((b, idx) =>
+                        `<div class="card" style="margin-bottom:12px;">
+                            <div class="flex-between">
+                                <strong style="font-size:1.1rem;color:var(--gold);" contenteditable="true" data-hb-index="${idx}" data-field="title">${b.title}</strong>
+                                <button class="btn-sm" style="color:var(--text-muted);" data-action="remove-hb" data-idx="${idx}">✕</button>
+                            </div>
+                            <div class="card-value editable" contenteditable="true" data-hb-index="${idx}" data-field="content" style="margin-top:6px;">${b.content}</div>
+                        </div>`
+                    ).join('');
+                }
+            }
+
+            // --- MAPA ---
+            function renderMapa() {
+                const inner = document.getElementById('map-inner');
+                const img = document.getElementById('map-image');
+                const placeholder = document.getElementById('map-placeholder');
+
+                const mapImgData = data.mapImage || '';
+                if (mapImgData) {
+                    img.src = mapImgData;
+                    img.style.display = 'block';
+                    placeholder.style.display = 'none';
+                    const w = data.mapImageWidth || 800;
+                    const h = data.mapImageHeight || 600;
+                    const wrapper = document.getElementById('map-wrapper');
+                    const wrapperRect = wrapper.getBoundingClientRect();
+                    const wrapperW = wrapperRect.width;
+                    const wrapperH = wrapperRect.height;
+                    let scaleX = wrapperW / w;
+                    let scaleY = wrapperH / h;
+                    let fitScale = Math.min(scaleX, scaleY, 1);
+                    if (scaleX > 1 && scaleY > 1) fitScale = 1;
+                    else fitScale = Math.min(scaleX, scaleY);
+                    const displayW = w * fitScale;
+                    const displayH = h * fitScale;
+                    inner.style.width = displayW + 'px';
+                    inner.style.height = displayH + 'px';
+                    mapState.scale = 1;
+                    mapState.panX = 0;
+                    mapState.panY = 0;
+                    applyMapTransform();
+                } else {
+                    img.style.display = 'none';
+                    placeholder.style.display = 'flex';
+                    inner.style.width = '100%';
+                    inner.style.height = '100%';
+                }
+
+                renderMarkers();
+                document.getElementById('marker-count').textContent = data.markers.length + ' marcadores';
+            }
+
+            function renderMarkers() {
+                const inner = document.getElementById('map-inner');
+                const existing = inner.querySelectorAll('.map-marker');
+                existing.forEach(el => el.remove());
+
+                data.markers.forEach(m => {
+                    const div = document.createElement('div');
+                    div.className = 'map-marker';
+                    div.dataset.markerId = m.id;
+                    div.style.left = m.x + '%';
+                    div.style.top = m.y + '%';
+                    div.innerHTML = `<span class="label">${m.name}</span>`;
+                    div.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openMarkerDetail(m.id);
+                    });
+                    inner.appendChild(div);
+                });
+            }
+
+            function applyMapTransform() {
+                const inner = document.getElementById('map-inner');
+                const s = mapState.scale;
+                const x = mapState.panX;
+                const y = mapState.panY;
+                inner.style.transform = `translate(${x}px, ${y}px) scale(${s})`;
+            }
+
+            // --- LOCAIS ---
+            function renderLocais() {
+                const container = document.getElementById('locais-list');
+                const empty = document.getElementById('locais-empty');
+                if (data.locais.length === 0) {
+                    container.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+                empty.style.display = 'none';
+                container.innerHTML = data.locais.map(l => {
+                    const thumb = l.imagemPrincipal ? `<div class="thumb"><img src="${l.imagemPrincipal}" alt="" /></div>` :
+                        '';
+                    return `<div class="list-item">
+                        <div class="info">
+                            <div class="name">📍 ${l.name}</div>
+                            <div class="sub">${l.category || 'Sem categoria'} · ${l.description || ''}</div>
+                        </div>
+                        ${thumb}
+                        <div class="actions">
+                            <button data-action="edit-local" data-id="${l.id}">Editar</button>
+                            <button class="danger" data-action="remove-local" data-id="${l.id}">✕</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // --- RUAS ---
+            function renderRuas() {
+                const container = document.getElementById('ruas-list');
+                const empty = document.getElementById('ruas-empty');
+                if (data.ruas.length === 0) {
+                    container.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+                empty.style.display = 'none';
+                container.innerHTML = data.ruas.map(r => {
+                    const thumb = r.imagemPrincipal ? `<div class="thumb"><img src="${r.imagemPrincipal}" alt="" /></div>` :
+                        '';
+                    return `<div class="list-item">
+                        <div class="info">
+                            <div class="name">🏘️ ${r.name}</div>
+                            <div class="sub">${r.description || ''}</div>
+                        </div>
+                        ${thumb}
+                        <div class="actions">
+                            <button data-action="view-rua" data-id="${r.id}">👁️</button>
+                            <button data-action="edit-rua" data-id="${r.id}">Editar</button>
+                            <button class="danger" data-action="remove-rua" data-id="${r.id}">✕</button>
+                        </div>
+                    </div>`;
+                }).join('');
+            }
+
+            // --- TIMELINE ---
+            function renderTimeline() {
+                const container = document.getElementById('timeline-container');
+                const empty = document.getElementById('timeline-empty');
+                if (data.timeline.length === 0) {
+                    container.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+                empty.style.display = 'none';
+                container.innerHTML = data.timeline.map(t =>
+                    `<div class="timeline-item">
+                        <div class="date">${t.date || 'Data indefinida'}</div>
+                        <div class="title">${t.title}</div>
+                        <div class="desc">${t.description || ''}</div>
+                        ${t.image ? `<div class="img-thumb"><img src="${t.image}" alt="${t.title}" /></div>` : ''}
+                        <div style="margin-top:6px;">
+                            <button class="btn-sm" style="color:var(--text-muted);" data-action="edit-timeline" data-id="${t.id}">Editar</button>
+                            <button class="btn-sm" style="color:#8b2a2a;" data-action="remove-timeline" data-id="${t.id}">✕</button>
+                        </div>
+                    </div>`
+                ).join('');
+            }
+
+            // --- GALERIA ---
+            function renderGaleria(filter = 'todos') {
+                const container = document.getElementById('gallery-grid');
+                const empty = document.getElementById('gallery-empty');
+                let items = data.galeria;
+                if (filter !== 'todos') {
+                    items = items.filter(g => g.categoria === filter);
+                }
+                if (items.length === 0) {
+                    container.innerHTML = '';
+                    empty.style.display = 'block';
+                    return;
+                }
+                empty.style.display = 'none';
+                container.innerHTML = items.map(g => {
+                    const img = g.imagemPrincipal || (g.imagens && g.imagens.length ? g.imagens[0] : '');
+                    return `<div class="g-item" data-id="${g.id}">
+                        <img src="${img}" alt="${g.titulo || 'Sem título'}" />
+                        <div class="overlay">
+                            ${g.titulo || 'Sem título'}
+                            <span class="tag">${g.categoria || 'geral'}</span>
+                        </div>
+                    </div>`;
+                }).join('');
+                // guardar itens para lightbox
+                lbItems = items;
+            }
+
+            // ============================
+            // NAVEGAÇÃO
+            // ============================
+            function navigateTo(sectionId) {
+                document.querySelectorAll('.section').forEach(el => el.classList.remove('active'));
+                document.getElementById(sectionId).classList.add('active');
+                document.querySelectorAll('.nav-list button').forEach(el => el.classList.remove('active'));
+                document.querySelector(`.nav-list button[data-section="${sectionId}"]`)?.classList.add('active');
+                currentSection = sectionId;
+                switch (sectionId) {
+                    case 'visao-geral':
+                        renderVisaoGeral();
+                        break;
+                    case 'historia':
+                        renderHistoria();
+                        break;
+                    case 'mapa':
+                        renderMapa();
+                        break;
+                    case 'locais':
+                        renderLocais();
+                        break;
+                    case 'ruas':
+                        renderRuas();
+                        break;
+                    case 'timeline':
+                        renderTimeline();
+                        break;
+                    case 'galeria':
+                        renderGaleria(document.querySelector('.filter-bar .filter-btn.active')?.dataset.filter || 'todos');
+                        break;
+                }
+            }
+
+            // ============================
+            // BACKUP
+            // ============================
+            function exportBackup() {
+                const json = JSON.stringify(data, null, 2);
+                const blob = new Blob([json], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `cidade_backup_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            function importBackup() {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const reader = new FileReader();
+                    reader.onload = (ev) => {
+                        try {
+                            const imported = JSON.parse(ev.target.result);
+                            if (!confirm('Isso substituirá todos os dados atuais. Continuar?')) return;
+                            // mesclar com defaults para garantir estrutura
+                            data = deepMerge(DEFAULT_DATA, imported);
+                            // atualizar contadores
+                            if (data.markers.length) markerIdCounter = Math.max(...data.markers.map(m => m.id || 0)) + 1;
+                            if (data.locais.length) localIdCounter = Math.max(...data.locais.map(l => l.id || 0)) + 1;
+                            if (data.ruas.length) ruaIdCounter = Math.max(...data.ruas.map(r => r.id || 0)) + 1;
+                            if (data.timeline.length) timelineIdCounter = Math.max(...data.timeline.map(t => t.id || 0)) +
+                            1;
+                            if (data.galeria.length) galeriaIdCounter = Math.max(...data.galeria.map(g => g.id || 0)) + 1;
+                            saveData();
+                            // re-renderizar tudo
+                            renderVisaoGeral();
+                            renderHistoria();
+                            renderMapa();
+                            renderLocais();
+                            renderRuas();
+                            renderTimeline();
+                            renderGaleria(document.querySelector('.filter-bar .filter-btn.active')?.dataset.filter ||
+                            'todos');
+                            alert('Backup importado com sucesso!');
+                        } catch (err) {
+                            alert('Erro ao importar: arquivo inválido.');
+                        }
+                    };
+                    reader.readAsText(file);
+                };
+                input.click();
+            }
+
+            document.getElementById('btn-export-backup').addEventListener('click', exportBackup);
+            document.getElementById('btn-import-backup').addEventListener('click', importBackup);
+
+            // ============================
+            // EVENTOS · NAVEGAÇÃO
+            // ============================
+            document.querySelectorAll('.nav-list button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    navigateTo(btn.dataset.section);
+                });
+            });
+
+            // ============================
+            // EVENTOS · VISÃO GERAL
+            // ============================
+            document.addEventListener('input', (e) => {
+                const el = e.target;
+                if (el.id === 'city-name') data.hero.name = el.textContent;
+                if (el.id === 'city-nick') data.hero.nick = el.textContent;
+                if (el.id === 'city-tagline') data.hero.tagline = el.textContent;
+                if (el.id === 'city-location') data.hero.location = el.textContent;
+                if (el.dataset.cardIndex !== undefined && el.dataset.field === 'value') {
+                    const idx = parseInt(el.dataset.cardIndex);
+                    if (data.infoCards[idx]) data.infoCards[idx].value = el.textContent;
+                }
+                if (el.dataset.hbIndex !== undefined) {
+                    const idx = parseInt(el.dataset.hbIndex);
+                    const field = el.dataset.field;
+                    if (data.historiaBlocks[idx]) {
+                        data.historiaBlocks[idx][field] = el.textContent;
+                    }
+                }
+                saveData();
+            });
+
+            document.getElementById('hero-image').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = async (ev) => {
+                    const file = ev.target.files[0];
+                    if (!file) return;
+                    const b64 = await toBase64(file);
+                    data.hero.image = b64;
+                    saveData();
+                    renderVisaoGeral();
+                };
+                input.click();
+            });
+
+            document.getElementById('add-gallery-item').addEventListener('click', () => {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'image/*';
+                input.onchange = async (ev) => {
+                    const file = ev.target.files[0];
+                    if (!file) return;
+                    const b64 = await toBase64(file);
+                    const title = prompt('Título da imagem:') || 'Imagem';
+                    data.galleryMini.push({ image: b64, title });
+                    saveData();
+                    renderVisaoGeral();
+                };
+                input.click();
+            });
+
+            document.getElementById('historia-blocks').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action="remove-hb"]');
+                if (btn) {
+                    const idx = parseInt(btn.dataset.idx);
+                    data.historiaBlocks.splice(idx, 1);
+                    saveData();
+                    renderHistoria();
+                }
+            });
+
+            document.getElementById('add-historia-block').addEventListener('click', () => {
+                const title = prompt('Título do bloco:') || 'Novo bloco';
+                const content = prompt('Conteúdo:') || '';
+                data.historiaBlocks.push({ title, content });
+                saveData();
+                renderHistoria();
+            });
+
+            // ============================
+            // EVENTOS · MAPA
+            // ============================
+            const mapWrapper = document.getElementById('map-wrapper');
+            const mapInner = document.getElementById('map-inner');
+
+            document.getElementById('map-upload').addEventListener('change', async (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                const b64 = await toBase64(file);
+                data.mapImage = b64;
+                const img = new Image();
+                img.onload = function() {
+                    data.mapImageWidth = img.width;
+                    data.mapImageHeight = img.height;
+                    saveData();
+                    renderMapa();
+                };
+                img.src = b64;
+            });
+
+            document.getElementById('map-zoom-in').addEventListener('click', () => {
+                mapState.scale = clamp(mapState.scale * 1.25, 0.3, 5);
+                applyMapTransform();
+            });
+            document.getElementById('map-zoom-out').addEventListener('click', () => {
+                mapState.scale = clamp(mapState.scale / 1.25, 0.3, 5);
+                applyMapTransform();
+            });
+            document.getElementById('map-reset').addEventListener('click', () => {
+                mapState.scale = 1;
+                mapState.panX = 0;
+                mapState.panY = 0;
+                applyMapTransform();
+            });
+
+            let dragData = null;
+            mapWrapper.addEventListener('mousedown', (e) => {
+                if (e.target.closest('.map-marker') || e.target.closest('.map-controls')) return;
+                dragData = {
+                    startX: e.clientX,
+                    startY: e.clientY,
+                    panX: mapState.panX,
+                    panY: mapState.panY
+                };
+                mapWrapper.style.cursor = 'grabbing';
+            });
+            document.addEventListener('mousemove', (e) => {
+                if (!dragData) return;
+                const dx = e.clientX - dragData.startX;
+                const dy = e.clientY - dragData.startY;
+                mapState.panX = dragData.panX + dx;
+                mapState.panY = dragData.panY + dy;
+                applyMapTransform();
+            });
+            document.addEventListener('mouseup', () => {
+                if (dragData) {
+                    dragData = null;
+                    mapWrapper.style.cursor = 'grab';
+                }
+            });
+
+            document.getElementById('btn-add-marker').addEventListener('click', () => {
+                isAddingMarker = !isAddingMarker;
+                document.getElementById('btn-add-marker').classList.toggle('btn-gold');
+                document.getElementById('btn-add-marker').classList.toggle('btn-gold-outline');
+                mapWrapper.style.cursor = isAddingMarker ? 'crosshair' : 'grab';
+            });
+
+            mapWrapper.addEventListener('click', (e) => {
+                if (!isAddingMarker) return;
+                if (e.target.closest('.map-marker')) return;
+                const rect = mapInner.getBoundingClientRect();
+                const x = ((e.clientX - rect.left) / rect.width) * 100;
+                const y = ((e.clientY - rect.top) / rect.height) * 100;
+                if (x < 0 || x > 100 || y < 0 || y > 100) return;
+
+                openModal('Novo Marcador', `
+                    <div class="form-group">
+                        <label>Nome do local</label>
+                        <input class="input-dark" id="marker-name" placeholder="Ex: Farol Velho" />
+                    </div>
+                    <div class="form-group">
+                        <label>Categoria</label>
+                        <input class="input-dark" id="marker-category" placeholder="Ex: Farol, Igreja, Praça" />
+                    </div>
+                    <div class="form-group">
+                        <label>Descrição curta</label>
+                        <textarea class="input-dark" id="marker-desc" placeholder="O que é este lugar?"></textarea>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-top:8px;">
+                        <button class="btn-gold" id="marker-save">Salvar marcador</button>
+                        <button class="btn-gold-outline" id="marker-cancel">Cancelar</button>
+                    </div>
+                `);
+                document.getElementById('marker-save').onclick = () => {
+                    const name = document.getElementById('marker-name').value.trim() || 'Local sem nome';
+                    const category = document.getElementById('marker-category').value.trim() || 'Geral';
+                    const description = document.getElementById('marker-desc').value.trim() || '';
+                    const id = markerIdCounter++;
+                    const marker = { id, x: clamp(x, 1, 99), y: clamp(y, 1, 99), name, category, description };
+                    data.markers.push(marker);
+                    const localId = localIdCounter++;
+                    data.locais.push({
+                        id: localId,
+                        markerId: id,
+                        name: name,
+                        category: category,
+                        description: description,
+                        history: '',
+                        importance: '',
+                        imagemPrincipal: '',
+                        imagens: [],
+                        personagens: '',
+                        capitulos: '',
+                        eventos: '',
+                        objetos: '',
+                        sons: '',
+                        atmosfera: ''
+                    });
+                    saveData();
+                    closeModal();
+                    isAddingMarker = false;
+                    document.getElementById('btn-add-marker').classList.remove('btn-gold');
+                    document.getElementById('btn-add-marker').classList.add('btn-gold-outline');
+                    mapWrapper.style.cursor = 'grab';
+                    renderMapa();
+                    renderLocais();
+                };
+                document.getElementById('marker-cancel').onclick = closeModal;
+            });
+
+            // detalhe do marcador
+            function openMarkerDetail(markerId) {
+                const marker = data.markers.find(m => m.id === markerId);
+                if (!marker) return;
+                const local = data.locais.find(l => l.markerId === markerId);
+                const galeriaHtml = local && local.imagens && local.imagens.length ?
+                    `<div style="margin-top:12px;">
+                        <label style="font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);">Galeria do local</label>
+                        <div class="image-preview-grid">
+                            ${local.imagens.map(img => `<div class="img-thumb"><img src="${img}" /></div>`).join('')}
+                        </div>
+                    </div>` :
+                    '';
+
+                const imgHtml = local && local.imagemPrincipal ?
+                    `<div style="margin-bottom:12px;"><img src="${local.imagemPrincipal}" style="max-width:100%;max-height:200px;border-radius:6px;border:1px solid var(--border-subtle);" /></div>` :
+                    '';
+
+                openModal(`📍 ${marker.name}`, `
+                    ${imgHtml}
+                    <div style="margin-bottom:12px;">
+                        <div style="font-weight:300;color:var(--text-secondary);">${marker.category || 'Geral'}</div>
+                        <p style="margin:8px 0;">${marker.description || 'Sem descrição.'}</p>
+                    </div>
+                    ${local ? `
+                        <hr style="border-color:var(--border-subtle);margin:16px 0;" />
+                        <div style="font-size:0.85rem;color:var(--text-secondary);">
+                            <div><strong>História:</strong> ${local.history || '—'}</div>
+                            <div><strong>Importância:</strong> ${local.importance || '—'}</div>
+                            <div><strong>Personagens:</strong> ${local.personagens || '—'}</div>
+                            <div><strong>Capítulos:</strong> ${local.capitulos || '—'}</div>
+                            <div><strong>Atmosfera:</strong> ${local.atmosfera || '—'}</div>
+                        </div>
+                        ${galeriaHtml}
+                        <div style="margin-top:12px;">
+                            <button class="btn-gold-outline btn-sm" data-action="edit-local-detail" data-id="${local.id}">Editar detalhes</button>
+                        </div>
+                    ` : `<p class="text-muted">Nenhum local vinculado.</p>`}
+                    <div style="margin-top:16px;">
+                        <button class="btn-gold-outline btn-sm" data-action="remove-marker" data-id="${markerId}">Remover marcador</button>
+                    </div>
+                `);
+                document.querySelector('#modal-body [data-action="edit-local-detail"]')?.addEventListener('click', () => {
+                    if (local) openLocalEditor(local.id);
+                });
+                document.querySelector('#modal-body [data-action="remove-marker"]')?.addEventListener('click', () => {
+                    if (confirm('Remover este marcador e seu local?')) {
+                        data.markers = data.markers.filter(m => m.id !== markerId);
+                        data.locais = data.locais.filter(l => l.markerId !== markerId);
+                        saveData();
+                        closeModal();
+                        renderMapa();
+                        renderLocais();
+                    }
+                });
+            }
+
+            // ============================
+            // EVENTOS · LOCAIS (edição)
+            // ============================
+            function openLocalEditor(localId) {
+                const local = data.locais.find(l => l.id === localId);
+                if (!local) return;
+
+                const galeriaThumbs = (local.imagens || []).map((img, idx) =>
+                    `<div class="img-thumb">
+                        <img src="${img}" />
+                        <div class="remove-img" data-img-idx="${idx}">✕</div>
+                    </div>`
+                ).join('');
+
+                openModal(`Editar Local: ${local.name}`, `
+                    <div class="form-group"><label>Nome</label><input class="input-dark" id="el-name" value="${local.name}" /></div>
+                    <div class="form-group"><label>Categoria</label><input class="input-dark" id="el-category" value="${local.category || ''}" /></div>
+                    <div class="form-group"><label>Descrição</label><textarea class="input-dark" id="el-desc">${local.description || ''}</textarea></div>
+                    <div class="form-group"><label>História</label><textarea class="input-dark" id="el-history">${local.history || ''}</textarea></div>
+                    <div class="form-group"><label>Importância narrativa</label><textarea class="input-dark" id="el-importance">${local.importance || ''}</textarea></div>
+                    <div class="form-group"><label>Personagens presentes</label><input class="input-dark" id="el-personagens" value="${local.personagens || ''}" /></div>
+                    <div class="form-group"><label>Capítulos onde aparece</label><input class="input-dark" id="el-capitulos" value="${local.capitulos || ''}" /></div>
+                    <div class="form-group"><label>Eventos importantes</label><input class="input-dark" id="el-eventos" value="${local.eventos || ''}" /></div>
+                    <div class="form-group"><label>Objetos encontrados</label><input class="input-dark" id="el-objetos" value="${local.objetos || ''}" /></div>
+                    <div class="form-group"><label>Sons</label><input class="input-dark" id="el-sons" value="${local.sons || ''}" /></div>
+                    <div class="form-group"><label>Atmosfera</label><textarea class="input-dark" id="el-atmosfera">${local.atmosfera || ''}</textarea></div>
+
+                    <div class="form-group"><label>Imagem principal</label>
+                        <input type="file" accept="image/*" id="el-main-img" />
+                        ${local.imagemPrincipal ? `<div style="margin-top:6px;"><img src="${local.imagemPrincipal}" style="max-height:100px;border-radius:4px;border:1px solid var(--border-subtle);" /></div>` : ''}
+                    </div>
+
+                    <div class="form-group"><label>Galeria do local</label>
+                        <input type="file" accept="image/*" multiple id="el-galeria-input" />
+                        <div class="image-preview-grid" id="el-galeria-preview">${galeriaThumbs}</div>
+                    </div>
+
+                    <div style="display:flex;gap:12px;margin-top:8px;">
+                        <button class="btn-gold" id="el-save">Salvar</button>
+                        <button class="btn-gold-outline" id="el-cancel">Cancelar</button>
+                    </div>
+                `);
+
+                document.getElementById('el-main-img').addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    const b64 = await toBase64(file);
+                    local.imagemPrincipal = b64;
+                    const container = document.getElementById('el-main-img').parentNode;
+                    const existing = container.querySelector('img');
+                    if (existing) existing.remove();
+                    const img = document.createElement('img');
+                    img.src = b64;
+                    img.style.maxHeight = '100px';
+                    img.style.borderRadius = '4px';
+                    img.style.border = '1px solid var(--border-subtle)';
+                    img.style.marginTop = '6px';
+                    container.appendChild(img);
+                });
+
+                document.getElementById('el-galeria-input').addEventListener('change', async (e) => {
+                    const files = e.target.files;
+                    for (const file of files) {
+                        const b64 = await toBase64(file);
+                        if (!local.imagens) local.imagens = [];
+                        local.imagens.push(b64);
+                    }
+                    const preview = document.getElementById('el-galeria-preview');
+                    preview.innerHTML = (local.imagens || []).map((img, idx) =>
+                        `<div class="img-thumb">
+                            <img src="${img}" />
+                            <div class="remove-img" data-img-idx="${idx}">✕</div>
+                        </div>`
+                    ).join('');
+                });
+
+                document.getElementById('el-galeria-preview').addEventListener('click', (e) => {
+                    const btn = e.target.closest('.remove-img');
+                    if (btn) {
+                        const idx = parseInt(btn.dataset.imgIdx);
+                        if (!isNaN(idx) && local.imagens) {
+                            local.imagens.splice(idx, 1);
+                            const preview = document.getElementById('el-galeria-preview');
+                            preview.innerHTML = (local.imagens || []).map((img, i) =>
+                                `<div class="img-thumb">
+                                    <img src="${img}" />
+                                    <div class="remove-img" data-img-idx="${i}">✕</div>
+                                </div>`
+                            ).join('');
+                        }
+                    }
+                });
+
+                document.getElementById('el-save').onclick = () => {
+                    local.name = document.getElementById('el-name').value.trim() || local.name;
+                    local.category = document.getElementById('el-category').value.trim();
+                    local.description = document.getElementById('el-desc').value.trim();
+                    local.history = document.getElementById('el-history').value.trim();
+                    local.importance = document.getElementById('el-importance').value.trim();
+                    local.personagens = document.getElementById('el-personagens').value.trim();
+                    local.capitulos = document.getElementById('el-capitulos').value.trim();
+                    local.eventos = document.getElementById('el-eventos').value.trim();
+                    local.objetos = document.getElementById('el-objetos').value.trim();
+                    local.sons = document.getElementById('el-sons').value.trim();
+                    local.atmosfera = document.getElementById('el-atmosfera').value.trim();
+                    saveData();
+                    closeModal();
+                    renderLocais();
+                    renderMapa();
+                };
+                document.getElementById('el-cancel').onclick = closeModal;
+            }
+
+            document.getElementById('locais-list').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                const id = parseInt(btn.dataset.id);
+                if (btn.dataset.action === 'edit-local') {
+                    openLocalEditor(id);
+                }
+                if (btn.dataset.action === 'remove-local') {
+                    if (confirm('Remover este local?')) {
+                        const local = data.locais.find(l => l.id === id);
+                        if (local) {
+                            data.markers = data.markers.filter(m => m.id !== local.markerId);
+                            data.locais = data.locais.filter(l => l.id !== id);
+                            saveData();
+                            renderLocais();
+                            renderMapa();
+                        }
+                    }
+                }
+            });
+
+            // ============================
+            // EVENTOS · RUAS (com múltiplas imagens e visualização)
+            // ============================
+            document.getElementById('add-rua').addEventListener('click', () => {
+                openModal('Nova Rua', `
+                    <div class="form-group"><label>Nome</label><input class="input-dark" id="rua-name" placeholder="Ex: Avenida do Farol" /></div>
+                    <div class="form-group"><label>Descrição</label><textarea class="input-dark" id="rua-desc" placeholder="Descrição da rua..."></textarea></div>
+                    <div class="form-group"><label>História</label><textarea class="input-dark" id="rua-history" placeholder="História da rua..."></textarea></div>
+                    <div class="form-group"><label>Importância narrativa</label><textarea class="input-dark" id="rua-importance" placeholder="Importância..."></textarea></div>
+                    <div class="form-group"><label>Locais próximos</label><input class="input-dark" id="rua-nearby" placeholder="Ex: Farol, Igreja" /></div>
+                    <div class="form-group"><label>Imagem principal</label>
+                        <input type="file" accept="image/*" id="rua-main-img" />
+                    </div>
+                    <div class="form-group"><label>Galeria de imagens</label>
+                        <input type="file" accept="image/*" multiple id="rua-galeria-input" />
+                        <div class="image-preview-grid" id="rua-galeria-preview"></div>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-top:8px;">
+                        <button class="btn-gold" id="rua-save">Salvar</button>
+                        <button class="btn-gold-outline" id="rua-cancel">Cancelar</button>
+                    </div>
+                `);
+                let ruaImagens = [];
+                let ruaImagemPrincipal = '';
+
+                document.getElementById('rua-main-img').addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    ruaImagemPrincipal = await toBase64(file);
+                    const container = document.getElementById('rua-main-img').parentNode;
+                    const existing = container.querySelector('img');
+                    if (existing) existing.remove();
+                    const img = document.createElement('img');
+                    img.src = ruaImagemPrincipal;
+                    img.style.maxHeight = '100px';
+                    img.style.borderRadius = '4px';
+                    img.style.border = '1px solid var(--border-subtle)';
+                    img.style.marginTop = '6px';
+                    container.appendChild(img);
+                });
+
+                document.getElementById('rua-galeria-input').addEventListener('change', async (e) => {
+                    const files = e.target.files;
+                    for (const file of files) {
+                        const b64 = await toBase64(file);
+                        ruaImagens.push(b64);
+                    }
+                    const preview = document.getElementById('rua-galeria-preview');
+                    preview.innerHTML = ruaImagens.map((img, idx) =>
+                        `<div class="img-thumb">
+                            <img src="${img}" />
+                            <div class="remove-img" data-img-idx="${idx}">✕</div>
+                        </div>`
+                    ).join('');
+                });
+
+                document.getElementById('rua-galeria-preview').addEventListener('click', (e) => {
+                    const btn = e.target.closest('.remove-img');
+                    if (btn) {
+                        const idx = parseInt(btn.dataset.imgIdx);
+                        if (!isNaN(idx)) {
+                            ruaImagens.splice(idx, 1);
+                            const preview = document.getElementById('rua-galeria-preview');
+                            preview.innerHTML = ruaImagens.map((img, i) =>
+                                `<div class="img-thumb">
+                                    <img src="${img}" />
+                                    <div class="remove-img" data-img-idx="${i}">✕</div>
+                                </div>`
+                            ).join('');
+                        }
+                    }
+                });
+
+                document.getElementById('rua-save').onclick = () => {
+                    const name = document.getElementById('rua-name').value.trim() || 'Rua sem nome';
+                    const description = document.getElementById('rua-desc').value.trim();
+                    const history = document.getElementById('rua-history').value.trim();
+                    const importance = document.getElementById('rua-importance').value.trim();
+                    const nearby = document.getElementById('rua-nearby').value.trim();
+                    data.ruas.push({
+                        id: ruaIdCounter++,
+                        name,
+                        description,
+                        history,
+                        importance,
+                        nearby,
+                        imagemPrincipal: ruaImagemPrincipal,
+                        imagens: [...ruaImagens]
+                    });
+                    saveData();
+                    closeModal();
+                    renderRuas();
+                };
+                document.getElementById('rua-cancel').onclick = closeModal;
+            });
+
+            // visualizar rua
+            function viewRua(id) {
+                const rua = data.ruas.find(r => r.id === id);
+                if (!rua) return;
+                const imagens = rua.imagens || [];
+                const principal = rua.imagemPrincipal || (imagens.length ? imagens[0] : '');
+                const galeriaThumbs = imagens.map(img =>
+                    `<div class="img-thumb"><img src="${img}" /></div>`
+                ).join('');
+
+                openModal(`🏘️ ${rua.name}`, `
+                    ${principal ? `<div style="margin-bottom:16px;"><img src="${principal}" style="max-width:100%;max-height:300px;border-radius:6px;border:1px solid var(--border-subtle);" /></div>` : ''}
+                    <div style="font-size:0.85rem;color:var(--text-secondary);">
+                        <div><strong>Descrição:</strong> ${rua.description || '—'}</div>
+                        <div><strong>História:</strong> ${rua.history || '—'}</div>
+                        <div><strong>Importância narrativa:</strong> ${rua.importance || '—'}</div>
+                        <div><strong>Locais próximos:</strong> ${rua.nearby || '—'}</div>
+                    </div>
+                    ${imagens.length ? `
+                        <div style="margin-top:16px;">
+                            <label style="font-size:0.75rem;text-transform:uppercase;color:var(--text-muted);">Galeria</label>
+                            <div class="image-preview-grid">${galeriaThumbs}</div>
+                        </div>
+                    ` : ''}
+                `);
+            }
+
+            document.getElementById('ruas-list').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                const id = parseInt(btn.dataset.id);
+                if (btn.dataset.action === 'view-rua') {
+                    viewRua(id);
+                }
+                if (btn.dataset.action === 'edit-rua') {
+                    const rua = data.ruas.find(r => r.id === id);
+                    if (!rua) return;
+                    const galeriaThumbs = (rua.imagens || []).map((img, idx) =>
+                        `<div class="img-thumb">
+                            <img src="${img}" />
+                            <div class="remove-img" data-img-idx="${idx}">✕</div>
+                        </div>`
+                    ).join('');
+                    openModal(`Editar Rua: ${rua.name}`, `
+                        <div class="form-group"><label>Nome</label><input class="input-dark" id="rua-edit-name" value="${rua.name}" /></div>
+                        <div class="form-group"><label>Descrição</label><textarea class="input-dark" id="rua-edit-desc">${rua.description || ''}</textarea></div>
+                        <div class="form-group"><label>História</label><textarea class="input-dark" id="rua-edit-history">${rua.history || ''}</textarea></div>
+                        <div class="form-group"><label>Importância narrativa</label><textarea class="input-dark" id="rua-edit-importance">${rua.importance || ''}</textarea></div>
+                        <div class="form-group"><label>Locais próximos</label><input class="input-dark" id="rua-edit-nearby" value="${rua.nearby || ''}" /></div>
+                        <div class="form-group"><label>Imagem principal</label>
+                            ${rua.imagemPrincipal ? `<img src="${rua.imagemPrincipal}" style="max-height:100px;border-radius:4px;border:1px solid var(--border-subtle);margin-bottom:6px;" />` : ''}
+                            <input type="file" accept="image/*" id="rua-edit-main" />
+                        </div>
+                        <div class="form-group"><label>Galeria</label>
+                            <input type="file" accept="image/*" multiple id="rua-edit-galeria" />
+                            <div class="image-preview-grid" id="rua-edit-galeria-preview">${galeriaThumbs}</div>
+                        </div>
+                        <div style="display:flex;gap:12px;margin-top:8px;">
+                            <button class="btn-gold" id="rua-edit-save">Salvar</button>
+                            <button class="btn-gold-outline" id="rua-edit-cancel">Cancelar</button>
+                        </div>
+                    `);
+
+                    // edição de imagens
+                    document.getElementById('rua-edit-main').addEventListener('change', async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        rua.imagemPrincipal = await toBase64(file);
+                        const container = document.getElementById('rua-edit-main').parentNode;
+                        const existing = container.querySelector('img');
+                        if (existing) existing.remove();
+                        const img = document.createElement('img');
+                        img.src = rua.imagemPrincipal;
+                        img.style.maxHeight = '100px';
+                        img.style.borderRadius = '4px';
+                        img.style.border = '1px solid var(--border-subtle)';
+                        img.style.marginBottom = '6px';
+                        container.prepend(img);
+                    });
+
+                    document.getElementById('rua-edit-galeria').addEventListener('change', async (e) => {
+                        const files = e.target.files;
+                        for (const file of files) {
+                            const b64 = await toBase64(file);
+                            if (!rua.imagens) rua.imagens = [];
+                            rua.imagens.push(b64);
+                        }
+                        const preview = document.getElementById('rua-edit-galeria-preview');
+                        preview.innerHTML = (rua.imagens || []).map((img, idx) =>
+                            `<div class="img-thumb">
+                                <img src="${img}" />
+                                <div class="remove-img" data-img-idx="${idx}">✕</div>
+                            </div>`
+                        ).join('');
+                    });
+
+                    document.getElementById('rua-edit-galeria-preview').addEventListener('click', (e) => {
+                        const btn = e.target.closest('.remove-img');
+                        if (btn) {
+                            const idx = parseInt(btn.dataset.imgIdx);
+                            if (!isNaN(idx) && rua.imagens) {
+                                rua.imagens.splice(idx, 1);
+                                const preview = document.getElementById('rua-edit-galeria-preview');
+                                preview.innerHTML = (rua.imagens || []).map((img, i) =>
+                                    `<div class="img-thumb">
+                                        <img src="${img}" />
+                                        <div class="remove-img" data-img-idx="${i}">✕</div>
+                                    </div>`
+                                ).join('');
+                            }
+                        }
+                    });
+
+                    document.getElementById('rua-edit-save').onclick = () => {
+                        rua.name = document.getElementById('rua-edit-name').value.trim() || rua.name;
+                        rua.description = document.getElementById('rua-edit-desc').value.trim();
+                        rua.history = document.getElementById('rua-edit-history').value.trim();
+                        rua.importance = document.getElementById('rua-edit-importance').value.trim();
+                        rua.nearby = document.getElementById('rua-edit-nearby').value.trim();
+                        saveData();
+                        closeModal();
+                        renderRuas();
+                    };
+                    document.getElementById('rua-edit-cancel').onclick = closeModal;
+                }
+                if (btn.dataset.action === 'remove-rua') {
+                    if (confirm('Remover esta rua?')) {
+                        data.ruas = data.ruas.filter(r => r.id !== id);
+                        saveData();
+                        renderRuas();
+                    }
+                }
+            });
+
+            // ============================
+            // EVENTOS · TIMELINE
+            // ============================
+            document.getElementById('add-timeline-event').addEventListener('click', () => {
+                openModal('Novo Evento', `
+                    <div class="form-group"><label>Data</label><input class="input-dark" id="tl-date" placeholder="Ex: 1876" /></div>
+                    <div class="form-group"><label>Título</label><input class="input-dark" id="tl-title" placeholder="Título do evento" /></div>
+                    <div class="form-group"><label>Descrição</label><textarea class="input-dark" id="tl-desc" placeholder="Descrição..."></textarea></div>
+                    <div class="form-group"><label>Imagem</label><input type="file" accept="image/*" id="tl-image-input" /></div>
+                    <div style="display:flex;gap:12px;margin-top:8px;">
+                        <button class="btn-gold" id="tl-save">Salvar</button>
+                        <button class="btn-gold-outline" id="tl-cancel">Cancelar</button>
+                    </div>
+                `);
+                let tlImageData = '';
+                document.getElementById('tl-image-input').addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    tlImageData = await toBase64(file);
+                });
+                document.getElementById('tl-save').onclick = () => {
+                    const date = document.getElementById('tl-date').value.trim();
+                    const title = document.getElementById('tl-title').value.trim() || 'Evento';
+                    const description = document.getElementById('tl-desc').value.trim();
+                    data.timeline.push({ id: timelineIdCounter++, date, title, description, image: tlImageData });
+                    saveData();
+                    closeModal();
+                    renderTimeline();
+                };
+                document.getElementById('tl-cancel').onclick = closeModal;
+            });
+
+            document.getElementById('timeline-container').addEventListener('click', (e) => {
+                const btn = e.target.closest('[data-action]');
+                if (!btn) return;
+                const id = parseInt(btn.dataset.id);
+                if (btn.dataset.action === 'edit-timeline') {
+                    const ev = data.timeline.find(t => t.id === id);
+                    if (!ev) return;
+                    openModal(`Editar Evento`, `
+                        <div class="form-group"><label>Data</label><input class="input-dark" id="tl-edit-date" value="${ev.date || ''}" /></div>
+                        <div class="form-group"><label>Título</label><input class="input-dark" id="tl-edit-title" value="${ev.title}" /></div>
+                        <div class="form-group"><label>Descrição</label><textarea class="input-dark" id="tl-edit-desc">${ev.description || ''}</textarea></div>
+                        <div class="form-group"><label>Imagem atual</label>
+                            ${ev.image ? `<img src="${ev.image}" style="max-height:120px;border-radius:4px;border:1px solid var(--border-subtle);" />` : 'Nenhuma imagem'}
+                            <input type="file" accept="image/*" id="tl-edit-image" />
+                        </div>
+                        <div style="display:flex;gap:12px;margin-top:8px;">
+                            <button class="btn-gold" id="tl-edit-save">Salvar</button>
+                            <button class="btn-gold-outline" id="tl-edit-cancel">Cancelar</button>
+                        </div>
+                    `);
+                    document.getElementById('tl-edit-image').addEventListener('change', async (e) => {
+                        const file = e.target.files[0];
+                        if (!file) return;
+                        ev.image = await toBase64(file);
+                        const container = document.getElementById('tl-edit-image').parentNode;
+                        const existing = container.querySelector('img');
+                        if (existing) existing.remove();
+                        const img = document.createElement('img');
+                        img.src = ev.image;
+                        img.style.maxHeight = '120px';
+                        img.style.borderRadius = '4px';
+                        img.style.border = '1px solid var(--border-subtle)';
+                        container.prepend(img);
+                    });
+                    document.getElementById('tl-edit-save').onclick = () => {
+                        ev.date = document.getElementById('tl-edit-date').value.trim();
+                        ev.title = document.getElementById('tl-edit-title').value.trim() || ev.title;
+                        ev.description = document.getElementById('tl-edit-desc').value.trim();
+                        saveData();
+                        closeModal();
+                        renderTimeline();
+                    };
+                    document.getElementById('tl-edit-cancel').onclick = closeModal;
+                }
+                if (btn.dataset.action === 'remove-timeline') {
+                    if (confirm('Remover este evento?')) {
+                        data.timeline = data.timeline.filter(t => t.id !== id);
+                        saveData();
+                        renderTimeline();
+                    }
+                }
+            });
+
+            // ============================
+            // EVENTOS · GALERIA (múltiplas imagens)
+            // ============================
+            document.getElementById('add-galeria-item').addEventListener('click', () => {
+                openModal('Novo Item da Galeria', `
+                    <div class="form-group"><label>Título</label><input class="input-dark" id="gal-titulo" placeholder="Título do item" /></div>
+                    <div class="form-group"><label>Descrição</label><textarea class="input-dark" id="gal-desc" placeholder="Descrição..."></textarea></div>
+                    <div class="form-group"><label>Categoria</label>
+                        <select class="input-dark" id="gal-categoria">
+                            <option value="cidade">Cidade</option>
+                            <option value="ruas">Ruas</option>
+                            <option value="arquitetura">Arquitetura</option>
+                            <option value="locais">Locais</option>
+                            <option value="interiores">Interiores</option>
+                            <option value="natureza">Natureza</option>
+                            <option value="costa">Costa</option>
+                            <option value="objetos">Objetos</option>
+                            <option value="referencias">Referências</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Tags (separadas por vírgula)</label><input class="input-dark" id="gal-tags" placeholder="Ex: farol, mar, neblina" /></div>
+                    <div class="form-group"><label>Imagem principal</label>
+                        <input type="file" accept="image/*" id="gal-main-img" />
+                    </div>
+                    <div class="form-group"><label>Galeria de imagens</label>
+                        <input type="file" accept="image/*" multiple id="gal-imagens-input" />
+                        <div class="image-preview-grid" id="gal-imagens-preview"></div>
+                    </div>
+                    <div style="display:flex;gap:12px;margin-top:8px;">
+                        <button class="btn-gold" id="gal-save">Salvar</button>
+                        <button class="btn-gold-outline" id="gal-cancel">Cancelar</button>
+                    </div>
+                `);
+
+                let galImagens = [];
+                let galImagemPrincipal = '';
+
+                document.getElementById('gal-main-img').addEventListener('change', async (e) => {
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    galImagemPrincipal = await toBase64(file);
+                    const container = document.getElementById('gal-main-img').parentNode;
+                    const existing = container.querySelector('img');
+                    if (existing) existing.remove();
+                    const img = document.createElement('img');
+                    img.src = galImagemPrincipal;
+                    img.style.maxHeight = '100px';
+                    img.style.borderRadius = '4px';
+                    img.style.border = '1px solid var(--border-subtle)';
+                    img.style.marginTop = '6px';
+                    container.appendChild(img);
+                });
+
+                document.getElementById('gal-imagens-input').addEventListener('change', async (e) => {
+                    const files = e.target.files;
+                    for (const file of files) {
+                        const b64 = await toBase64(file);
+                        galImagens.push(b64);
+                    }
+                    const preview = document.getElementById('gal-imagens-preview');
+                    preview.innerHTML = galImagens.map((img, idx) =>
+                        `<div class="img-thumb">
+                            <img src="${img}" />
+                            <div class="remove-img" data-img-idx="${idx}">✕</div>
+                        </div>`
+                    ).join('');
+                });
+
+                document.getElementById('gal-imagens-preview').addEventListener('click', (e) => {
+                    const btn = e.target.closest('.remove-img');
+                    if (btn) {
+                        const idx = parseInt(btn.dataset.imgIdx);
+                        if (!isNaN(idx)) {
+                            galImagens.splice(idx, 1);
+                            const preview = document.getElementById('gal-imagens-preview');
+                            preview.innerHTML = galImagens.map((img, i) =>
+                                `<div class="img-thumb">
+                                    <img src="${img}" />
+                                    <div class="remove-img" data-img-idx="${i}">✕</div>
+                                </div>`
+                            ).join('');
+                        }
+                    }
+                });
+
+                document.getElementById('gal-save').onclick = () => {
+                    const titulo = document.getElementById('gal-titulo').value.trim() || 'Sem título';
+                    const descricao = document.getElementById('gal-desc').value.trim();
+                    const categoria = document.getElementById('gal-categoria').value;
+                    const tags = document.getElementById('gal-tags').value.split(',').map(s => s.trim()).filter(Boolean);
+                    data.galeria.push({
+                        id: galeriaIdCounter++,
+                        titulo,
+                        descricao,
+                        categoria,
+                        tags,
+                        imagemPrincipal: galImagemPrincipal,
+                        imagens: [...galImagens]
+                    });
+                    saveData();
+                    closeModal();
+                    const activeFilter = document.querySelector('.filter-bar .filter-btn.active')?.dataset.filter || 'todos';
+                    renderGaleria(activeFilter);
+                };
+                document.getElementById('gal-cancel').onclick = closeModal;
+            });
+
+            // filtros
+            document.querySelectorAll('.filter-bar .filter-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-bar .filter-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    renderGaleria(btn.dataset.filter);
+                });
+            });
+
+            // ============================
+            // LIGHTBOX (slideshow para galeria)
+            // ============================
+            function openLightbox(index) {
+                if (!lbItems.length || index < 0 || index >= lbItems.length) return;
+                lbCurrentIndex = index;
+                const item = lbItems[index];
+                // definir qual imagem mostrar: se houver imagens, usar a primeira, senão a principal
+                const images = item.imagens && item.imagens.length ? item.imagens : (item.imagemPrincipal ? [item
+                    .imagemPrincipal] : []);
+                // para o lightbox, usamos todas as imagens do item
+                // vamos armazenar no lbItems a lista de imagens para navegação
+                // mas para simplificar, vamos abrir o lightbox com a primeira imagem e permitir navegar pelas imagens do item
+                // Precisamos de um estado para navegação dentro do item
+                // Vamos criar um array de imagens do item
+                const allImages = images;
+                if (!allImages.length) return;
+                // guardar no escopo da função
+                window._lbImages = allImages;
+                window._lbCurrentImageIndex = 0;
+                window._lbItem = item;
+                showLightboxImage(0);
+                document.getElementById('lightbox-overlay').classList.add('open');
+                updateLightboxInfo(item);
+            }
+
+            function showLightboxImage(idx) {
+                const images = window._lbImages || [];
+                if (!images.length) return;
+                if (idx < 0) idx = images.length - 1;
+                if (idx >= images.length) idx = 0;
+                window._lbCurrentImageIndex = idx;
+                document.getElementById('lb-image').src = images[idx];
+                document.getElementById('lb-counter').textContent = `${idx+1} / ${images.length}`;
+            }
+
+            function updateLightboxInfo(item) {
+                document.getElementById('lb-title').textContent = item.titulo || 'Sem título';
+                document.getElementById('lb-desc').textContent = item.descricao || '';
+                document.getElementById('lb-meta').textContent = (item.categoria || 'geral') + (item.tags && item.tags.length ?
+                    ' · ' + item.tags.join(', ') : '');
+            }
+
+            function closeLightbox() {
+                document.getElementById('lightbox-overlay').classList.remove('open');
+                window._lbImages = null;
+                window._lbItem = null;
+            }
+
+            function navigateLightbox(delta) {
+                const images = window._lbImages || [];
+                if (!images.length) return;
+                let idx = (window._lbCurrentImageIndex || 0) + delta;
+                if (idx < 0) idx = images.length - 1;
+                if (idx >= images.length) idx = 0;
+                showLightboxImage(idx);
+            }
+
+            document.getElementById('lightbox-close').addEventListener('click', closeLightbox);
+            document.getElementById('lightbox-prev').addEventListener('click', () => navigateLightbox(-1));
+            document.getElementById('lightbox-next').addEventListener('click', () => navigateLightbox(1));
+            document.getElementById('lightbox-overlay').addEventListener('click', (e) => {
+                if (e.target === e.currentTarget) closeLightbox();
+            });
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    if (document.getElementById('lightbox-overlay').classList.contains('open')) closeLightbox();
+                    else closeModal();
+                }
+                if (e.key === 'ArrowLeft' && document.getElementById('lightbox-overlay').classList.contains('open'))
+                    navigateLightbox(-1);
+                if (e.key === 'ArrowRight' && document.getElementById('lightbox-overlay').classList.contains('open'))
+                    navigateLightbox(1);
+            });
+
+            // clique na galeria para abrir lightbox
+            document.getElementById('gallery-grid').addEventListener('click', (e) => {
+                const item = e.target.closest('.g-item');
+                if (!item) return;
+                const id = parseInt(item.dataset.id);
+                const galItem = lbItems.find(g => g.id === id);
+                if (galItem) {
+                    // preparar imagens
+                    const images = galItem.imagens && galItem.imagens.length ? galItem.imagens : (galItem.imagemPrincipal ? [
+                        galItem.imagemPrincipal
+                    ] : []);
+                    if (!images.length) return;
+                    window._lbImages = images;
+                    window._lbItem = galItem;
+                    window._lbCurrentImageIndex = 0;
+                    showLightboxImage(0);
+                    updateLightboxInfo(galItem);
+                    document.getElementById('lightbox-overlay').classList.add('open');
+                }
+            });
+
+            // ============================
+            // INICIALIZAÇÃO
+            // ============================
+            function init() {
+                if (window.hub && typeof window.hub.get === 'function') {
+                    const hubData = window.hub.get('cidade_data');
+                    if (hubData) {
+                        data = deepMerge(data, hubData);
+                        // atualizar contadores
+                        if (data.markers.length) markerIdCounter = Math.max(...data.markers.map(m => m.id || 0)) + 1;
+                        if (data.locais.length) localIdCounter = Math.max(...data.locais.map(l => l.id || 0)) + 1;
+                        if (data.ruas.length) ruaIdCounter = Math.max(...data.ruas.map(r => r.id || 0)) + 1;
+                        if (data.timeline.length) timelineIdCounter = Math.max(...data.timeline.map(t => t.id || 0)) + 1;
+                        if (data.galeria.length) galeriaIdCounter = Math.max(...data.galeria.map(g => g.id || 0)) + 1;
+                        saveData();
+                    }
+                }
+                renderVisaoGeral();
+                renderHistoria();
+                renderMapa();
+                renderLocais();
+                renderRuas();
+                renderTimeline();
+                renderGaleria('todos');
+                setInterval(saveData, 10000);
+                document.getElementById('modal-close').addEventListener('click', closeModal);
+                document.getElementById('modal-overlay').addEventListener('click', (e) => {
+                    if (e.target === e.currentTarget) closeModal();
+                });
+                console.log('🏛️ Módulo Cidade v3 inicializado.');
+            }
+
+            init();
+
+        })();
+    </script>
+</body>
+</html>
