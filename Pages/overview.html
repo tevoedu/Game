@@ -1,0 +1,3019 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vila dos Ventos — Painel Costeiro</title>
+    <style>
+        /* ============================================================
+           RESET & BASE — Tema Costeiro Noturno
+           ============================================================ */
+        *,
+        *::before,
+        *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-primary: #0b1c2b;
+            /* azul marinho profundo */
+            --bg-secondary: #122a3f;
+            --bg-card: rgba(28, 50, 70, 0.7);
+            --bg-glass: rgba(45, 75, 100, 0.45);
+            --border-glass: rgba(180, 210, 230, 0.15);
+            --text-primary: #eaf2f8;
+            --text-secondary: #bfd4e5;
+            --text-muted: #8aaec9;
+            --accent: #4c8b9c;
+            /* turquesa */
+            --accent-light: #7ab8cc;
+            --accent-warm: #d4a373;
+            /* areia */
+            --accent-sage: #8ab3a0;
+            /* verde água */
+            --accent-glow: rgba(76, 139, 156, 0.2);
+            --shadow: 0 20px 50px rgba(0, 0, 0, 0.6);
+            --radius: 24px;
+            --radius-sm: 14px;
+            --transition: 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            --font: 'Segoe UI', 'Helvetica Neue', system-ui, sans-serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        ::selection {
+            background: var(--accent-warm);
+            color: #0b1c2b;
+        }
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        img {
+            display: block;
+            max-width: 100%;
+        }
+        a {
+            color: inherit;
+            text-decoration: none;
+        }
+        button {
+            cursor: pointer;
+            font: inherit;
+            border: none;
+            background: none;
+            color: inherit;
+        }
+
+        /* ============================================================
+           UTILITY
+           ============================================================ */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 40px;
+        }
+
+        .section-title {
+            font-size: 1.9rem;
+            font-weight: 300;
+            letter-spacing: 0.06em;
+            color: var(--text-primary);
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+            padding-right: 20px;
+            transition: var(--transition);
+            border-radius: 4px;
+            cursor: text;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 60px;
+            height: 2px;
+            background: var(--accent-warm);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+        .section-title:hover::after {
+            width: 100px;
+        }
+        .section-title:focus {
+            outline: 1px dashed var(--accent-light);
+            outline-offset: 6px;
+            background: rgba(76, 139, 156, 0.05);
+        }
+
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius);
+        }
+
+        .btn-edit {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 22px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            background: rgba(76, 139, 156, 0.15);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .btn-edit:hover {
+            background: var(--accent);
+            color: #fff;
+            border-color: var(--accent);
+        }
+
+        .btn-add {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 26px;
+            border-radius: 100px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            background: var(--accent-warm);
+            color: #0b1c2b;
+            transition: var(--transition);
+            border: 1px solid var(--accent-warm);
+        }
+        .btn-add:hover {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+            transform: scale(1.03);
+            box-shadow: 0 4px 20px rgba(212, 163, 115, 0.3);
+        }
+
+        /* ============================================================
+           HERO — Costeiro Noturno
+           ============================================================ */
+        .hero {
+            position: relative;
+            min-height: 85vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: var(--bg-primary);
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: #0b1c2b url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect width="100" height="100" fill="%230b1c2b"/%3E%3C/svg%3E') center/cover no-repeat;
+            z-index: 0;
+            transition: background-image 0.8s ease;
+        }
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg,
+                    rgba(11, 28, 43, 0.2) 0%,
+                    rgba(11, 28, 43, 0.7) 60%,
+                    rgba(11, 28, 43, 0.9) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 850px;
+            padding: 40px 20px;
+        }
+
+        .hero-badge {
+            display: inline-block;
+            padding: 5px 22px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            background: var(--accent-warm);
+            color: #0b1c2b;
+            margin-bottom: 1.5rem;
+            cursor: text;
+            transition: var(--transition);
+        }
+        .hero-badge:focus {
+            outline: 1px dashed var(--accent-light);
+            background: var(--accent);
+            color: #fff;
+        }
+
+        .hero-title {
+            font-size: clamp(3.2rem, 10vw, 6rem);
+            font-weight: 200;
+            letter-spacing: 0.04em;
+            line-height: 1.1;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            text-shadow: 0 4px 40px rgba(0, 0, 0, 0.7);
+            cursor: text;
+        }
+        .hero-title span {
+            color: var(--accent-warm);
+            font-weight: 400;
+        }
+        .hero-title:focus {
+            outline: 1px dashed var(--accent-light);
+            border-radius: 4px;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1rem, 2.2vw, 1.5rem);
+            font-weight: 300;
+            color: var(--text-secondary);
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            cursor: text;
+        }
+        .hero-subtitle:focus {
+            outline: 1px dashed var(--accent-light);
+            border-radius: 4px;
+        }
+
+        .hero-slogan {
+            font-size: clamp(1rem, 1.8vw, 1.4rem);
+            font-weight: 300;
+            color: var(--text-muted);
+            font-style: italic;
+            margin-bottom: 1.8rem;
+            cursor: text;
+        }
+        .hero-slogan:focus {
+            outline: 1px dashed var(--accent-light);
+            border-radius: 4px;
+        }
+
+        .hero-meta {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px 30px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 2rem;
+        }
+        .hero-meta span {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .hero-meta .label {
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.6rem;
+            letter-spacing: 0.08em;
+        }
+        .hero-meta [contenteditable] {
+            cursor: text;
+            border-radius: 4px;
+            padding: 0 4px;
+        }
+        .hero-meta [contenteditable]:focus {
+            outline: 1px dashed var(--accent-light);
+        }
+
+        .hero-desc {
+            max-width: 650px;
+            margin: 0 auto 2.8rem;
+            font-size: 1.05rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.9;
+            cursor: text;
+            padding: 4px 8px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+        .hero-desc:focus {
+            outline: 1px dashed var(--accent-light);
+            background: rgba(76, 139, 156, 0.04);
+        }
+
+        .hero-actions {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 14px;
+        }
+
+        .hero-cover-upload {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            z-index: 5;
+            opacity: 0.5;
+            transition: var(--transition);
+        }
+        .hero-cover-upload:hover {
+            opacity: 1;
+        }
+        .hero-cover-upload label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 18px;
+            border-radius: 100px;
+            background: rgba(11, 28, 43, 0.75);
+            backdrop-filter: blur(8px);
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border: 1px solid var(--border-glass);
+        }
+        .hero-cover-upload input {
+            display: none;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            animation: bounce 2.5s infinite;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .scroll-indicator .arrow {
+            font-size: 1.2rem;
+        }
+        @keyframes bounce {
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            50% {
+                transform: translateX(-50%) translateY(10px);
+            }
+        }
+
+        /* ============================================================
+           ABOUT
+           ============================================================ */
+        .about {
+            padding: 80px 0;
+            background: var(--bg-secondary);
+        }
+
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+
+        .about-card {
+            padding: 34px 38px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-glass);
+            transition: var(--transition);
+        }
+        .about-card:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+        .about-card h3 {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent-warm);
+            margin-bottom: 0.6rem;
+            cursor: text;
+        }
+        .about-card h3:focus {
+            outline: 1px dashed var(--accent-light);
+            border-radius: 4px;
+        }
+        .about-card p,
+        .about-card div[contenteditable] {
+            font-weight: 300;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            font-size: 0.95rem;
+            border-radius: 4px;
+            padding: 2px 4px;
+            transition: var(--transition);
+        }
+        .about-card div[contenteditable]:focus {
+            outline: 1px dashed var(--accent-light);
+            background: rgba(76, 139, 156, 0.04);
+        }
+
+        /* ============================================================
+           SEÇÕES COM CARDS
+           ============================================================ */
+        .characters,
+        .locations,
+        .timeline-section,
+        .art-gallery,
+        .main-characters,
+        .moments,
+        .references,
+        .soundtrack,
+        .atmosphere {
+            padding: 80px 0;
+        }
+
+        .characters {
+            background: var(--bg-primary);
+        }
+        .locations {
+            background: var(--bg-secondary);
+        }
+        .timeline-section {
+            background: var(--bg-primary);
+        }
+        .art-gallery {
+            background: var(--bg-secondary);
+        }
+        .main-characters {
+            background: var(--bg-primary);
+        }
+        .moments {
+            background: var(--bg-secondary);
+        }
+        .references {
+            background: var(--bg-primary);
+        }
+        .soundtrack {
+            background: var(--bg-secondary);
+        }
+        .atmosphere {
+            background: var(--bg-primary);
+        }
+
+        .characters-header,
+        .locations-header,
+        .timeline-header,
+        .art-header,
+        .main-characters-header,
+        .moments-header,
+        .references-header,
+        .soundtrack-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px 20px;
+            margin-bottom: 2.5rem;
+        }
+
+        .characters-grid,
+        .locations-grid,
+        .art-grid,
+        .main-characters-grid {
+            display: grid;
+            gap: 30px;
+        }
+
+        .characters-grid {
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        }
+        .locations-grid {
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+        }
+        .art-grid {
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        }
+        .main-characters-grid {
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        }
+
+        .character-card,
+        .location-card,
+        .art-card,
+        .main-character-card,
+        .moment-card,
+        .reference-item {
+            border-radius: var(--radius);
+            overflow: hidden;
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(4px);
+        }
+        .character-card:hover,
+        .location-card:hover,
+        .art-card:hover,
+        .main-character-card:hover,
+        .moment-card:hover,
+        .reference-item:hover {
+            transform: translateY(-6px);
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+
+        .character-card .img-wrap,
+        .location-card .img-wrap,
+        .art-card .img-wrap,
+        .main-character-card .img-wrap,
+        .moment-card .img-wrap,
+        .reference-item .img-wrap {
+            overflow: hidden;
+            background: #1a3045;
+            position: relative;
+        }
+        .character-card .img-wrap {
+            aspect-ratio: 3/4;
+        }
+        .location-card .img-wrap {
+            aspect-ratio: 16/10;
+        }
+        .art-card .img-wrap {
+            aspect-ratio: 1/1;
+        }
+        .main-character-card .img-wrap {
+            aspect-ratio: 1/1;
+            border-radius: 50%;
+            width: 80%;
+            margin: 20px auto 0;
+            border: 2px solid var(--border-glass);
+            transition: var(--transition);
+        }
+        .main-character-card:hover .img-wrap {
+            border-color: var(--accent-warm);
+        }
+        .moment-card .img-wrap {
+            aspect-ratio: 16/10;
+        }
+        .reference-item .img-wrap {
+            aspect-ratio: 16/10;
+        }
+
+        .character-card .img-wrap img,
+        .location-card .img-wrap img,
+        .art-card .img-wrap img,
+        .main-character-card .img-wrap img,
+        .moment-card .img-wrap img,
+        .reference-item .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+        .character-card:hover .img-wrap img,
+        .location-card:hover .img-wrap img,
+        .art-card:hover .img-wrap img,
+        .main-character-card:hover .img-wrap img,
+        .moment-card:hover .img-wrap img,
+        .reference-item:hover .img-wrap img {
+            transform: scale(1.04);
+        }
+
+        .info {
+            padding: 16px 20px 20px;
+        }
+        .info h4 {
+            font-size: 1.1rem;
+            font-weight: 400;
+            letter-spacing: 0.02em;
+            margin-bottom: 2px;
+        }
+        .info .role,
+        .info .chapters,
+        .info .cat,
+        .info .chapter,
+        .info .tag {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--accent-warm);
+            font-weight: 500;
+        }
+        .info .desc,
+        .info .bio {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            font-weight: 300;
+        }
+        .main-character-card .info .color-bar {
+            width: 40px;
+            height: 3px;
+            margin: 0 auto 8px;
+            border-radius: 4px;
+        }
+
+        .card-actions {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            gap: 6px;
+            opacity: 0;
+            transition: var(--transition);
+        }
+        .character-card:hover .card-actions,
+        .location-card:hover .card-actions,
+        .art-card:hover .card-actions,
+        .main-character-card:hover .card-actions,
+        .moment-card:hover .card-actions,
+        .reference-item:hover .card-actions {
+            opacity: 1;
+        }
+        .card-actions button {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(11, 28, 43, 0.8);
+            backdrop-filter: blur(8px);
+            border: 1px solid var(--border-glass);
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: var(--text-secondary);
+        }
+        .card-actions button:hover {
+            background: var(--accent-warm);
+            color: #0b1c2b;
+        }
+
+        /* ============================================================
+           TIMELINE
+           ============================================================ */
+        .timeline {
+            position: relative;
+            padding: 20px 0 40px;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, transparent, var(--accent-warm), transparent);
+            transform: translateX(-50%);
+        }
+        .timeline-items {
+            display: flex;
+            flex-direction: column;
+            gap: 50px;
+        }
+        .timeline-item {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+            position: relative;
+        }
+        .timeline-item:nth-child(even) {
+            direction: rtl;
+        }
+        .timeline-item:nth-child(even) .timeline-content {
+            direction: ltr;
+        }
+        .timeline-item .dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: var(--accent-warm);
+            border: 3px solid var(--bg-primary);
+            box-shadow: 0 0 25px rgba(212, 163, 115, 0.4);
+            z-index: 2;
+        }
+        .timeline-content {
+            background: var(--bg-card);
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius);
+            padding: 24px 28px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .timeline-content:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+        .timeline-content .img-wrap {
+            aspect-ratio: 16/9;
+            overflow: hidden;
+            border-radius: var(--radius-sm);
+            margin-bottom: 14px;
+            background: #1a3045;
+        }
+        .timeline-content .img-wrap img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .timeline-content .date {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--accent-warm);
+            font-weight: 500;
+        }
+        .timeline-content h4 {
+            font-size: 1.15rem;
+            font-weight: 400;
+            margin: 4px 0 2px;
+        }
+        .timeline-content .desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        .timeline-content .chapter {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .timeline-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .timeline-actions button {
+            padding: 4px 14px;
+            border-radius: 100px;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(76, 139, 156, 0.1);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .timeline-actions button:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        /* ============================================================
+           ART FILTERS
+           ============================================================ */
+        .art-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .art-filters button {
+            padding: 6px 18px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(45, 75, 100, 0.5);
+            border: 1px solid var(--border-glass);
+            color: var(--text-muted);
+            transition: var(--transition);
+        }
+        .art-filters button:hover,
+        .art-filters button.active {
+            background: var(--accent-warm);
+            color: #0b1c2b;
+            border-color: var(--accent-warm);
+        }
+
+        /* ============================================================
+           MOMENTS SCROLL
+           ============================================================ */
+        .moments-scroll {
+            display: flex;
+            gap: 28px;
+            overflow-x: auto;
+            padding: 8px 4px 20px;
+            scroll-snap-type: x mandatory;
+        }
+        .moments-scroll::-webkit-scrollbar {
+            height: 4px;
+        }
+        .moments-scroll::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+        .moment-card {
+            min-width: 260px;
+            max-width: 300px;
+            flex-shrink: 0;
+            scroll-snap-align: start;
+        }
+
+        /* ============================================================
+           REFERENCES (masonry)
+           ============================================================ */
+        .references-grid {
+            columns: 240px 4;
+            column-gap: 24px;
+        }
+        .reference-item {
+            break-inside: avoid;
+            margin-bottom: 24px;
+        }
+
+        /* ============================================================
+           SOUNDTRACK
+           ============================================================ */
+        .soundtrack-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .soundtrack-item {
+            display: grid;
+            grid-template-columns: 2fr 2fr 1.5fr 1fr auto;
+            gap: 16px;
+            align-items: center;
+            padding: 14px 24px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            transition: var(--transition);
+            cursor: pointer;
+            backdrop-filter: blur(4px);
+        }
+        .soundtrack-item:hover {
+            border-color: var(--accent);
+            box-shadow: var(--shadow);
+        }
+        .soundtrack-item .name {
+            font-weight: 400;
+        }
+        .soundtrack-item .desc {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        .soundtrack-item .moment {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        .soundtrack-item .link a {
+            color: var(--accent-warm);
+            font-size: 0.75rem;
+            text-decoration: underline;
+            opacity: 0.6;
+            transition: var(--transition);
+        }
+        .soundtrack-item .link a:hover {
+            opacity: 1;
+        }
+        .soundtrack-item .actions {
+            display: flex;
+            gap: 6px;
+        }
+        .soundtrack-item .actions button {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: rgba(45, 75, 100, 0.5);
+            border: 1px solid var(--border-glass);
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .soundtrack-item .actions button:hover {
+            background: var(--accent-warm);
+            color: #0b1c2b;
+        }
+
+        /* ============================================================
+           ATMOSPHERE
+           ============================================================ */
+        .atmosphere-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        .atmo-panel {
+            padding: 32px 36px;
+            border-radius: var(--radius);
+            background: var(--bg-card);
+            border: 1px solid var(--border-glass);
+            backdrop-filter: blur(4px);
+        }
+        .atmo-panel h3 {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent-warm);
+            margin-bottom: 1rem;
+            cursor: text;
+        }
+        .atmo-panel h3:focus {
+            outline: 1px dashed var(--accent-light);
+            border-radius: 4px;
+        }
+
+        .color-palette {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .color-swatch {
+            width: 52px;
+            height: 52px;
+            border-radius: 12px;
+            border: 1px solid var(--border-glass);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        .color-swatch:hover {
+            transform: scale(1.08);
+        }
+
+        .mood-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .mood-grid .mood-item {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            background: rgba(45, 75, 100, 0.4);
+            border: 1px solid var(--border-glass);
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 300;
+            color: var(--text-secondary);
+        }
+
+        .keyword-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .keyword-cloud span {
+            padding: 4px 16px;
+            border-radius: 100px;
+            background: rgba(76, 139, 156, 0.1);
+            border: 1px solid rgba(76, 139, 156, 0.2);
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+
+        .emotion-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+        .emotion-list span {
+            padding: 6px 0;
+            border-bottom: 1px solid var(--border-glass);
+            font-weight: 300;
+            color: var(--text-secondary);
+        }
+
+        /* ============================================================
+           MODAL
+           ============================================================ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 999;
+            background: rgba(11, 28, 43, 0.85);
+            backdrop-filter: blur(18px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            max-width: 820px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: var(--bg-card);
+            backdrop-filter: blur(18px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius);
+            padding: 40px 44px;
+            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.7);
+            animation: slideUp 0.35s ease;
+            position: relative;
+        }
+        .modal::-webkit-scrollbar {
+            width: 4px;
+        }
+        .modal::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 20px;
+            font-size: 1.8rem;
+            font-weight: 300;
+            color: var(--text-muted);
+            transition: var(--transition);
+            line-height: 1;
+        }
+        .modal-close:hover {
+            color: var(--text-primary);
+            transform: rotate(90deg);
+        }
+
+        .modal h2 {
+            font-size: 2rem;
+            font-weight: 300;
+            letter-spacing: 0.02em;
+            margin-bottom: 0.2rem;
+        }
+        .modal .sub {
+            color: var(--accent-warm);
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 1.2rem;
+        }
+        .modal .modal-img {
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            margin-bottom: 1.5rem;
+            background: #1a3045;
+        }
+        .modal .modal-img img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: cover;
+        }
+        .modal .modal-body {
+            color: var(--text-secondary);
+            font-weight: 300;
+            line-height: 1.8;
+        }
+        .modal .modal-body p {
+            margin-bottom: 0.6rem;
+        }
+        .modal .modal-body .label {
+            color: var(--text-muted);
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            display: block;
+            margin-top: 0.8rem;
+        }
+        .modal .modal-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-glass);
+        }
+        .modal .modal-actions button {
+            padding: 8px 24px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            background: rgba(45, 75, 100, 0.5);
+            border: 1px solid var(--border-glass);
+            color: var(--text-secondary);
+            transition: var(--transition);
+        }
+        .modal .modal-actions button:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+        .modal .modal-actions button.danger:hover {
+            background: #b34a3a;
+            color: #fff;
+        }
+
+        /* Formulários dentro do modal */
+        .modal input,
+        .modal textarea,
+        .modal select {
+            width: 100%;
+            padding: 10px 14px;
+            border-radius: var(--radius-sm);
+            background: rgba(11, 28, 43, 0.6);
+            border: 1px solid var(--border-glass);
+            color: var(--text-primary);
+            font: inherit;
+            font-size: 0.9rem;
+            transition: var(--transition);
+        }
+        .modal input:focus,
+        .modal textarea:focus,
+        .modal select:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        .modal textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+        .modal .form-group {
+            margin-bottom: 1rem;
+        }
+        .modal .form-group label {
+            display: block;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+        .modal .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        .file-upload-wrapper {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .file-upload-wrapper input[type="text"] {
+            flex: 1;
+            min-width: 150px;
+        }
+        .file-upload-wrapper .file-btn {
+            padding: 8px 18px;
+            border-radius: 100px;
+            background: var(--accent);
+            color: #fff;
+            font-size: 0.7rem;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+        .file-upload-wrapper .file-btn:hover {
+            background: var(--accent-warm);
+            color: #0b1c2b;
+        }
+        .file-upload-wrapper input[type="file"] {
+            display: none;
+        }
+
+        /* ============================================================
+           ANIMAÇÕES
+           ============================================================ */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* ============================================================
+           RESPONSIVE
+           ============================================================ */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 0 24px;
+            }
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 24px;
+            }
+            .atmosphere-grid {
+                grid-template-columns: 1fr;
+            }
+            .timeline-item {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            .timeline-item:nth-child(even) {
+                direction: ltr;
+            }
+            .timeline-item .dot {
+                display: none;
+            }
+            .timeline-line {
+                display: none;
+            }
+            .soundtrack-item {
+                grid-template-columns: 1fr;
+                gap: 6px;
+                padding: 16px 20px;
+            }
+            .references-grid {
+                columns: 200px 2;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 0 16px;
+            }
+            .hero-title {
+                font-size: 2.6rem;
+            }
+            .hero-meta {
+                flex-direction: column;
+                gap: 6px;
+            }
+            .characters-grid {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 16px;
+            }
+            .locations-grid {
+                grid-template-columns: 1fr;
+            }
+            .art-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 14px;
+            }
+            .main-characters-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+                gap: 16px;
+            }
+            .moment-card {
+                min-width: 200px;
+            }
+            .references-grid {
+                columns: 160px 2;
+            }
+            .modal {
+                padding: 24px 20px;
+            }
+            .modal .form-row {
+                grid-template-columns: 1fr;
+            }
+            .hero-cover-upload {
+                bottom: 16px;
+                right: 16px;
+            }
+            .hero-cover-upload label {
+                font-size: 0.6rem;
+                padding: 4px 12px;
+            }
+            .about-card {
+                padding: 24px 20px;
+            }
+            .atmo-panel {
+                padding: 24px 20px;
+            }
+            .file-upload-wrapper {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .file-upload-wrapper input[type="text"] {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ============================================================
+    HERO
+    ============================================================ -->
+    <section class="hero" id="hero">
+        <div class="hero-bg" id="heroBg"
+        style="background-image: url('data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'100\' height=\'100\' viewBox=\'0 0 100 100\'%3E%3Crect width=\'100\' height=\'100\' fill=\'%230b1c2b\'/%3E%3C/svg%3E');">
+    </div>
+
+    <div class="hero-content">
+        <div class="hero-badge" id="heroGenre" contenteditable="true">Aventura · Cotidiano</div>
+        <h1 class="hero-title" id="heroTitle" contenteditable="true"><span>Vila</span> dos Ventos</h1>
+        <div class="hero-subtitle" id="heroSubtitle" contenteditable="true">Onde o mar encontra a memória</div>
+        <div class="hero-slogan" id="heroSlogan" contenteditable="true">"Cada onda guarda uma história, cada vento sopra um segredo."</div>
+        <div class="hero-meta">
+            <span><span class="label">Gênero</span> <span id="heroGenreLabel" contenteditable="true">Aventura · Cotidiano</span></span>
+            <span><span class="label">Status</span> <span id="heroStatus" contenteditable="true">Em desenvolvimento</span></span>
+        </div>
+        <div class="hero-desc" id="heroDesc" contenteditable="true">
+            Em uma pacata vila costeira, os moradores vivem em harmonia com o mar. Mas quando um antigo farol se acende misteriosamente, segredos adormecidos vêm à tona. Entre pescadores, artesãos e crianças que brincam na areia, uma história de pertencimento e descoberta se desenrola.
+        </div>
+        <div class="hero-actions">
+            <button class="btn-edit" data-edit="hero">✎ Trocar Imagem</button>
+        </div>
+    </div>
+
+    <div class="hero-cover-upload">
+        <label>
+            <span>🖼</span> Trocar imagem de fundo
+            <input type="file" accept="image/*" id="heroUpload" />
+        </label>
+    </div>
+
+    <div class="scroll-indicator">
+        <span class="arrow">↓</span>
+        <span>Explore a vila</span>
+    </div>
+</section>
+
+<!-- ============================================================
+ABOUT
+============================================================ -->
+<section class="about" id="about">
+    <div class="container">
+        <h2 class="section-title" data-section="about" contenteditable="true">Sobre a história</h2>
+        <div class="about-grid">
+            <div class="about-card">
+                <h3 contenteditable="true">Sinopse</h3>
+                <div contenteditable="true" id="aboutSynopsis">Na Vila dos Ventos, o mar é o coração da comunidade. Os pescadores conhecem as marés, os artesãos esculpem memórias em madeira, e as crianças correm pelas ruas de paralelepípedos. Quando o antigo farol, há décadas apagado, volta a brilhar, a pacata rotina é abalada. Lena, uma jovem que nunca deixou a vila, se vê no centro de um mistério que conecta seu passado ao destino de todos.</div>
+            </div>
+            <div class="about-card">
+                <h3 contenteditable="true">Premissa</h3>
+                <div contenteditable="true" id="aboutPremise">E se o lugar que você chama de lar guardasse segredos que nem os mais velhos conhecem? A Vila dos Ventos é um refúgio, mas também um enigma. Cada pedra, cada onda, cada vento carrega uma peça de um quebra-cabeça que só espera ser montado.</div>
+            </div>
+            <div class="about-card">
+                <h3 contenteditable="true">Mensagem principal</h3>
+                <div contenteditable="true" id="aboutMessage">As raízes mais profundas não estão na terra, mas nas histórias que escolhemos contar.</div>
+            </div>
+            <div class="about-card">
+                <h3 contenteditable="true">Atmosfera · Tema · Objetivo emocional</h3>
+                <div contenteditable="true" id="aboutAtmo">Atmosfera acolhedora e nostálgica, com tons de mistério e descoberta. O tema central é a conexão entre identidade e lugar. O objetivo emocional é fazer o jogador sentir o abraço do mar e a curiosidade pelo desconhecido, celebrando a beleza do cotidiano.</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+CHARACTERS
+============================================================ -->
+<section class="characters" id="characters">
+    <div class="container">
+        <div class="characters-header">
+            <h2 class="section-title" data-section="characters" contenteditable="true">Moradores</h2>
+            <button class="btn-add" id="addCharacter">+ Adicionar personagem</button>
+        </div>
+        <div class="characters-grid" id="charactersGrid"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+LOCATIONS
+============================================================ -->
+<section class="locations" id="locations">
+    <div class="container">
+        <div class="locations-header">
+            <h2 class="section-title" data-section="locations" contenteditable="true">Lugares da vila</h2>
+            <button class="btn-add" id="addLocation">+ Adicionar local</button>
+        </div>
+        <div class="locations-grid" id="locationsGrid"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+TIMELINE
+============================================================ -->
+<section class="timeline-section" id="timelineSection">
+    <div class="container">
+        <div class="timeline-header">
+            <h2 class="section-title" data-section="timeline" contenteditable="true">Linha do tempo</h2>
+            <button class="btn-add" id="addTimelineEvent">+ Adicionar evento</button>
+        </div>
+        <div class="timeline">
+            <div class="timeline-line"></div>
+            <div class="timeline-items" id="timelineItems"></div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+ART GALLERY
+============================================================ -->
+<section class="art-gallery" id="artGallery">
+    <div class="container">
+        <div class="art-header">
+            <h2 class="section-title" data-section="art" contenteditable="true">Galeria de artes</h2>
+            <div style="display:flex;gap:12px;flex-wrap:wrap;">
+                <div class="art-filters" id="artFilters">
+                    <button class="active" data-filter="all">Todas</button>
+                    <button data-filter="Concept">Concept</button>
+                    <button data-filter="Personagem">Personagens</button>
+                    <button data-filter="Cenário">Cenários</button>
+                    <button data-filter="Objeto">Objetos</button>
+                    <button data-filter="Ilustração">Ilustrações</button>
+                </div>
+                <button class="btn-add" id="addArt">+ Adicionar arte</button>
+            </div>
+        </div>
+        <div class="art-grid" id="artGrid"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+MAIN CHARACTERS
+============================================================ -->
+<section class="main-characters" id="mainCharacters">
+    <div class="container">
+        <div class="main-characters-header">
+            <h2 class="section-title" data-section="mainchar" contenteditable="true">Personagens principais</h2>
+            <button class="btn-add" id="addMainCharacter">+ Adicionar</button>
+        </div>
+        <div class="main-characters-grid" id="mainCharactersGrid"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+MOMENTS
+============================================================ -->
+<section class="moments" id="moments">
+    <div class="container">
+        <div class="moments-header">
+            <h2 class="section-title" data-section="moments" contenteditable="true">Momentos marcantes</h2>
+            <button class="btn-add" id="addMoment">+ Adicionar momento</button>
+        </div>
+        <div class="moments-scroll" id="momentsScroll"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+REFERENCES
+============================================================ -->
+<section class="references" id="references">
+    <div class="container">
+        <div class="references-header">
+            <h2 class="section-title" data-section="references" contenteditable="true">Mural de referências</h2>
+            <button class="btn-add" id="addReference">+ Adicionar referência</button>
+        </div>
+        <div class="references-grid" id="referencesGrid"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+SOUNDTRACK
+============================================================ -->
+<section class="soundtrack" id="soundtrack">
+    <div class="container">
+        <div class="soundtrack-header">
+            <h2 class="section-title" data-section="soundtrack" contenteditable="true">Trilha sonora</h2>
+            <button class="btn-add" id="addSoundtrack">+ Adicionar música</button>
+        </div>
+        <div class="soundtrack-list" id="soundtrackList"></div>
+    </div>
+</section>
+
+<!-- ============================================================
+ATMOSPHERE
+============================================================ -->
+<section class="atmosphere" id="atmosphere">
+    <div class="container">
+        <h2 class="section-title" data-section="atmosphere" contenteditable="true">Atmosfera</h2>
+        <div class="atmosphere-grid">
+            <div class="atmo-panel">
+                <h3 contenteditable="true">Paleta de cores</h3>
+                <div class="color-palette" id="colorPalette"></div>
+                <button class="btn-edit" style="margin-top:16px;" id="addColor">+ Adicionar cor</button>
+            </div>
+            <div class="atmo-panel">
+                <h3 contenteditable="true">Moodboard</h3>
+                <div class="mood-grid" id="moodGrid"></div>
+                <button class="btn-edit" style="margin-top:16px;" id="addMood">+ Adicionar</button>
+            </div>
+            <div class="atmo-panel">
+                <h3 contenteditable="true">Palavras-chave</h3>
+                <div class="keyword-cloud" id="keywordCloud"></div>
+                <button class="btn-edit" style="margin-top:16px;" id="addKeyword">+ Adicionar</button>
+            </div>
+            <div class="atmo-panel">
+                <h3 contenteditable="true">Emoções · Sensações</h3>
+                <div class="emotion-list" id="emotionList"></div>
+                <button class="btn-edit" style="margin-top:16px;" id="addEmotion">+ Adicionar</button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ============================================================
+MODAL
+============================================================ -->
+<div class="modal-overlay" id="modalOverlay">
+    <div class="modal" id="modalContent">
+        <button class="modal-close" id="modalClose">✕</button>
+        <div id="modalBody"></div>
+    </div>
+</div>
+
+<!-- ============================================================
+JAVASCRIPT
+============================================================ -->
+<script>
+    // ================================================================
+    // DATA LAYER
+    // ================================================================
+    const STORAGE_KEY = 'vilaDosVentosData_v3';
+
+    const defaultData = {
+        hero: {
+            title: 'Vila dos Ventos',
+            subtitle: 'Onde o mar encontra a memória',
+            slogan: '"Cada onda guarda uma história, cada vento sopra um segredo."',
+            genre: 'Aventura · Cotidiano',
+            status: 'Em desenvolvimento',
+            description: 'Em uma pacata vila costeira, os moradores vivem em harmonia com o mar. Mas quando um antigo farol se acende misteriosamente, segredos adormecidos vêm à tona. Entre pescadores, artesãos e crianças que brincam na areia, uma história de pertencimento e descoberta se desenrola.',
+            cover: ''
+        },
+        about: {
+            synopsis: 'Na Vila dos Ventos, o mar é o coração da comunidade. Os pescadores conhecem as marés, os artesãos esculpem memórias em madeira, e as crianças correm pelas ruas de paralelepípedos. Quando o antigo farol, há décadas apagado, volta a brilhar, a pacata rotina é abalada. Lena, uma jovem que nunca deixou a vila, se vê no centro de um mistério que conecta seu passado ao destino de todos.',
+            premise: 'E se o lugar que você chama de lar guardasse segredos que nem os mais velhos conhecem? A Vila dos Ventos é um refúgio, mas também um enigma. Cada pedra, cada onda, cada vento carrega uma peça de um quebra-cabeça que só espera ser montado.',
+            message: 'As raízes mais profundas não estão na terra, mas nas histórias que escolhemos contar.',
+            atmo: 'Atmosfera acolhedora e nostálgica, com tons de mistério e descoberta. O tema central é a conexão entre identidade e lugar. O objetivo emocional é fazer o jogador sentir o abraço do mar e a curiosidade pelo desconhecido, celebrando a beleza do cotidiano.'
+        },
+        sectionTitles: {
+            about: 'Sobre a história',
+            characters: 'Moradores',
+            locations: 'Lugares da vila',
+            timeline: 'Linha do tempo',
+            art: 'Galeria de artes',
+            mainchar: 'Personagens principais',
+            moments: 'Momentos marcantes',
+            references: 'Mural de referências',
+            soundtrack: 'Trilha sonora',
+            atmosphere: 'Atmosfera'
+        },
+        characters: [{
+            id: 'c1',
+            name: 'Lena',
+            role: 'Jovem sonhadora',
+            description: 'Uma artesã que nunca deixou a vila, mas que guarda um mapa antigo.',
+            image: '',
+            fullDesc: 'Lena é filha do faroleiro. Ela passa os dias esculpindo memórias em madeira e ouvindo as histórias dos pescadores. Quando o farol se acende, ela sente que algo a chama.',
+            age: '22',
+            personality: 'Curiosa, sensível, determinada',
+            curiosities: 'Coleciona conchas; sabe o nome de todas as estrelas; tem medo de águas profundas.',
+            history: 'Cresceu ouvindo lendas sobre o farol. Perdeu os pais ainda criança.',
+            goals: 'Descobrir o segredo do farol e encontrar seu lugar no mundo.',
+            relations: 'Avô (pescador), Tio (ferreiro), Amigos: João e Clara.',
+            links: ''
+        }, {
+            id: 'c2',
+            name: 'Seu Manoel',
+            role: 'Pescador mais velho',
+            description: 'Conhece cada canto da costa e guarda histórias do farol.',
+            image: '',
+            fullDesc: 'Seu Manoel é a memória viva da vila. Ele viu o farol brilhar uma vez, há muito tempo. Agora, ele decide contar o que sabe.',
+            age: '68',
+            personality: 'Sábio, calmo, reservado',
+            curiosities: 'Nunca aprendeu a ler, mas decifra as ondas; tem um gato chamado Vento.',
+            history: 'Pescou a vida inteira, perdeu a esposa para o mar.',
+            goals: 'Passar adiante o que sabe antes que o tempo o leve.',
+            relations: 'Lena (amiga), Clara (neta adotiva).',
+            links: ''
+        }],
+        locations: [{
+            id: 'l1',
+            name: 'Farol dos Ventos',
+            description: 'Um antigo farol no alto do penhasco, apagado por décadas.',
+            image: '',
+            chapters: 'Capítulos 1, 3, 5',
+            history: 'Construído por imigrantes há mais de um século, o farol guiava os barcos. Foi desativado após uma tempestade que matou o faroleiro.',
+            importance: 'É o coração do mistério e o ponto de partida da jornada.',
+            characters: 'Lena, Seu Manoel, o fantasma do faroleiro.',
+            objects: 'O mapa, a chave antiga, o diário do faroleiro.',
+            arts: '',
+            music: 'Tema do Farol — melancólico e ventoso.',
+            curiosities: 'Dizem que na noite de lua cheia, o farol brilha sozinho.'
+        }, {
+            id: 'l2',
+            name: 'Praia das Conchas',
+            description: 'A praia principal, onde as crianças brincam e os pescadores atracam.',
+            image: '',
+            chapters: 'Capítulo 2, 4',
+            history: 'Sempre foi o ponto de encontro da vila. As conchas que ali se encontram são usadas nos artesanatos.',
+            importance: 'Representa a vida comunitária e a conexão com o mar.',
+            characters: 'Lena, Clara, pescadores.',
+            objects: 'Conchas, barcos, redes.',
+            arts: '',
+            music: 'Tema da Praia — alegre e calmo.',
+            curiosities: 'A areia tem um tom rosado devido a cristais de coral.'
+        }],
+        timeline: [{
+            id: 't1',
+            title: 'O farol se acende',
+            description: 'Pela primeira vez em 30 anos, o farol dos ventos brilha durante a noite.',
+            date: 'Primeira noite de outono',
+            chapter: 'Capítulo 1',
+            image: ''
+        }, {
+            id: 't2',
+            title: 'O mapa de Lena',
+            description: 'Lena encontra um mapa antigo no sótão do farol, com marcas que não reconhece.',
+            date: 'Dia seguinte',
+            chapter: 'Capítulo 2',
+            image: ''
+        }],
+        artworks: [{
+            id: 'a1',
+            title: 'Farol ao entardecer',
+            category: 'Cenário',
+            image: '',
+            desc: 'O farol dos ventos visto da praia, com o sol se pondo.'
+        }, {
+            id: 'a2',
+            title: 'Lena esculpindo',
+            category: 'Personagem',
+            image: '',
+            desc: 'Lena trabalhando em uma escultura de madeira, com conchas ao redor.'
+        }],
+        mainCharacters: [{
+            id: 'm1',
+            name: 'Lena',
+            color: '#4c8b9c',
+            bio: 'A artesã que busca respostas no farol.',
+            image: ''
+        }, {
+            id: 'm2',
+            name: 'Seu Manoel',
+            color: '#d4a373',
+            bio: 'O velho pescador que guarda os segredos do mar.',
+            image: ''
+        }],
+        moments: [{
+            id: 'mom1',
+            title: 'O despertar do farol',
+            description: 'Lena vê o farol brilhar pela primeira vez e sente um calafrio.',
+            chapter: 'Capítulo 1',
+            image: ''
+        }, {
+            id: 'mom2',
+            title: 'A descoberta do mapa',
+            description: 'No sótão empoeirado, Lena encontra o mapa que mudará sua vida.',
+            chapter: 'Capítulo 2',
+            image: ''
+        }],
+        references: [{
+            id: 'r1',
+            note: 'Arquitetura de vilas pesqueiras portuguesas — ruas de pedra, casas baixas.',
+            tag: 'Arquitetura',
+            image: ''
+        }, {
+            id: 'r2',
+            note: 'Paleta de cores: azul-cinza, areia, branco, terracota.',
+            tag: 'Paleta',
+            image: ''
+        }],
+        soundtrack: [{
+            id: 's1',
+            name: 'Canção do Farol',
+            description: 'Melodia suave com acordeão e violino, lembrando o vento.',
+            moment: 'Cenas noturnas no farol.',
+            link: '',
+            notes: 'Inspirada em músicas folclóricas litorâneas.'
+        }, {
+            id: 's2',
+            name: 'Dança das Ondas',
+            description: 'Música ritmada com tambores e flauta, para os dias de feira.',
+            moment: 'Cenas na praia e no mercado.',
+            link: '',
+            notes: 'Reflete a alegria da comunidade.'
+        }],
+        atmosphere: {
+            colors: ['#4c8b9c', '#d4a373', '#8ab3a0', '#7ab8cc', '#eaf2f8'],
+            moods: ['Acolhedor', 'Nostálgico', 'Misterioso', 'Esperançoso', 'Calmo'],
+            keywords: ['Mar', 'Vento', 'Farol', 'Concha', 'Memória', 'História', 'Pertença'],
+            emotions: ['Paz', 'Curiosidade', 'Raízes', 'Descoberta', 'Conexão']
+        }
+    };
+
+    let data = {};
+
+    function loadData() {
+        try {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (raw) {
+                const parsed = JSON.parse(raw);
+                data = mergeDeep(defaultData, parsed);
+                return;
+            }
+        } catch (_) { /* ignore */ }
+        data = JSON.parse(JSON.stringify(defaultData));
+        saveData();
+    }
+
+    function saveData() {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function mergeDeep(target, source) {
+        const result = { ...target };
+        for (const key in source) {
+            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                result[key] = mergeDeep(target[key] || {}, source[key]);
+            } else {
+                result[key] = source[key];
+            }
+        }
+        return result;
+    }
+
+    function generateId() {
+        return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+    }
+
+    // ================================================================
+    // RENDER FUNCTIONS
+    // ================================================================
+
+    function renderHero() {
+        const h = data.hero;
+        document.getElementById('heroTitle').innerHTML = h.title.replace(/(Vila)/, '<span>$1</span>');
+        document.getElementById('heroSubtitle').textContent = h.subtitle;
+        document.getElementById('heroSlogan').textContent = h.slogan;
+        document.getElementById('heroGenre').textContent = h.genre;
+        document.getElementById('heroGenreLabel').textContent = h.genre;
+        document.getElementById('heroStatus').textContent = h.status;
+        document.getElementById('heroDesc').textContent = h.description;
+        if (h.cover) {
+            document.getElementById('heroBg').style.backgroundImage = `url(${h.cover})`;
+        }
+    }
+
+    function renderAbout() {
+        document.getElementById('aboutSynopsis').textContent = data.about.synopsis;
+        document.getElementById('aboutPremise').textContent = data.about.premise;
+        document.getElementById('aboutMessage').textContent = data.about.message;
+        document.getElementById('aboutAtmo').textContent = data.about.atmo;
+    }
+
+    function renderSectionTitles() {
+        document.querySelectorAll('.section-title[data-section]').forEach(el => {
+            const key = el.dataset.section;
+            if (data.sectionTitles[key]) {
+                el.textContent = data.sectionTitles[key];
+            }
+        });
+    }
+
+    function renderCharacters() {
+        const grid = document.getElementById('charactersGrid');
+        if (!data.characters.length) {
+            grid.innerHTML =
+                `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px 0;">Nenhum morador cadastrado.</p>`;
+            return;
+        }
+        grid.innerHTML = data.characters.map(c => `
+                <div class="character-card" data-id="${c.id}">
+                    <div class="img-wrap">
+                        <img src="${c.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%231a3045\'/%3E%3Ctext x=\'100\' y=\'110\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'16\' font-family=\'sans-serif\'%3E${c.name}%3C/text%3E%3C/svg%3E'}" alt="${c.name}" />
+                    </div>
+                    <div class="info">
+                        <h4>${c.name}</h4>
+                        <div class="role">${c.role}</div>
+                        <div class="desc">${c.description}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button data-action="edit-character" title="Editar">✎</button>
+                        <button data-action="delete-character" title="Remover">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        grid.querySelectorAll('.character-card').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openCharacterModal(id);
+            });
+        });
+    }
+
+    function renderLocations() {
+        const grid = document.getElementById('locationsGrid');
+        if (!data.locations.length) {
+            grid.innerHTML =
+                `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px 0;">Nenhum local adicionado.</p>`;
+            return;
+        }
+        grid.innerHTML = data.locations.map(l => `
+                <div class="location-card" data-id="${l.id}">
+                    <div class="img-wrap">
+                        <img src="${l.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'200\' viewBox=\'0 0 300 200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%231a3045\'/%3E%3Ctext x=\'150\' y=\'110\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'16\' font-family=\'sans-serif\'%3E${l.name}%3C/text%3E%3C/svg%3E'}" alt="${l.name}" />
+                    </div>
+                    <div class="info">
+                        <h4>${l.name}</h4>
+                        <div class="chapters">${l.chapters || ''}</div>
+                        <div class="desc">${l.description}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button data-action="edit-location" title="Editar">✎</button>
+                        <button data-action="delete-location" title="Remover">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        grid.querySelectorAll('.location-card').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openLocationModal(id);
+            });
+        });
+    }
+
+    function renderTimeline() {
+        const container = document.getElementById('timelineItems');
+        if (!data.timeline.length) {
+            container.innerHTML =
+                `<p style="color:var(--text-muted);text-align:center;padding:40px 0;grid-column:1/-1;">Nenhum evento na linha do tempo.</p>`;
+            return;
+        }
+        container.innerHTML = data.timeline.map((t, idx) => `
+                <div class="timeline-item" data-id="${t.id}">
+                    <div class="dot"></div>
+                    <div class="timeline-content" data-action="view-timeline" data-id="${t.id}">
+                        <div class="img-wrap">
+                            <img src="${t.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'225\' viewBox=\'0 0 400 225\'%3E%3Crect width=\'400\' height=\'225\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'120\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'16\' font-family=\'sans-serif\'%3E${t.title}%3C/text%3E%3C/svg%3E'}" alt="${t.title}" />
+                        </div>
+                        <div class="date">${t.date || ''}</div>
+                        <h4>${t.title}</h4>
+                        <div class="desc">${t.description}</div>
+                        <div class="chapter">${t.chapter || ''}</div>
+                        <div class="timeline-actions">
+                            <button data-action="edit-timeline" data-id="${t.id}">Editar</button>
+                            <button data-action="delete-timeline" data-id="${t.id}">Excluir</button>
+                            <button data-action="move-up" data-id="${t.id}" ${idx===0?'disabled':''}>↑</button>
+                            <button data-action="move-down" data-id="${t.id}" ${idx===data.timeline.length-1?'disabled':''}>↓</button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+        container.querySelectorAll('.timeline-content').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.timeline-actions') || e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openTimelineModal(id);
+            });
+        });
+    }
+
+    function renderArtGallery(filter) {
+        filter = filter || 'all';
+        const grid = document.getElementById('artGrid');
+        const items = filter === 'all' ? data.artworks : data.artworks.filter(a => a.category === filter);
+        if (!items.length) {
+            grid.innerHTML =
+                `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px 0;">Nenhuma arte encontrada.</p>`;
+            return;
+        }
+        grid.innerHTML = items.map(a => `
+                <div class="art-card" data-id="${a.id}">
+                    <div class="img-wrap">
+                        <img src="${a.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'300\' viewBox=\'0 0 300 300\'%3E%3Crect width=\'300\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'150\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'16\' font-family=\'sans-serif\'%3E${a.title}%3C/text%3E%3C/svg%3E'}" alt="${a.title}" />
+                    </div>
+                    <div class="info">
+                        <div class="cat">${a.category}</div>
+                        <div class="title">${a.title}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button data-action="edit-art" data-id="${a.id}">✎</button>
+                        <button data-action="delete-art" data-id="${a.id}">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        grid.querySelectorAll('.art-card').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openArtModal(id);
+            });
+        });
+    }
+
+    function renderMainCharacters() {
+        const grid = document.getElementById('mainCharactersGrid');
+        if (!data.mainCharacters.length) {
+            grid.innerHTML =
+                `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px 0;">Nenhum personagem principal.</p>`;
+            return;
+        }
+        grid.innerHTML = data.mainCharacters.map(m => `
+                <div class="main-character-card" data-id="${m.id}">
+                    <div class="img-wrap">
+                        <img src="${m.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'200\' height=\'200\' viewBox=\'0 0 200 200\'%3E%3Crect width=\'200\' height=\'200\' fill=\'%231a3045\'/%3E%3Ctext x=\'100\' y=\'110\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'14\' font-family=\'sans-serif\'%3E${m.name}%3C/text%3E%3C/svg%3E'}" alt="${m.name}" />
+                    </div>
+                    <div class="info">
+                        <div class="color-bar" style="background:${m.color || '#4c8b9c'}"></div>
+                        <h4>${m.name}</h4>
+                        <div class="bio">${m.bio}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button data-action="edit-mainchar" data-id="${m.id}">✎</button>
+                        <button data-action="delete-mainchar" data-id="${m.id}">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        grid.querySelectorAll('.main-character-card').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openMainCharModal(id);
+            });
+        });
+    }
+
+    function renderMoments() {
+        const scroll = document.getElementById('momentsScroll');
+        if (!data.moments.length) {
+            scroll.innerHTML =
+                `<p style="color:var(--text-muted);min-width:100%;text-align:center;padding:40px 0;">Nenhum momento adicionado.</p>`;
+            return;
+        }
+        scroll.innerHTML = data.moments.map(m => `
+                <div class="moment-card" data-id="${m.id}">
+                    <div class="img-wrap">
+                        <img src="${m.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'320\' height=\'200\' viewBox=\'0 0 320 200\'%3E%3Crect width=\'320\' height=\'200\' fill=\'%231a3045\'/%3E%3Ctext x=\'160\' y=\'110\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'14\' font-family=\'sans-serif\'%3E${m.title}%3C/text%3E%3C/svg%3E'}" alt="${m.title}" />
+                    </div>
+                    <div class="info">
+                        <div class="chapter">${m.chapter || ''}</div>
+                        <h4>${m.title}</h4>
+                        <div class="desc">${m.description}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button data-action="edit-moment" data-id="${m.id}">✎</button>
+                        <button data-action="delete-moment" data-id="${m.id}">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        scroll.querySelectorAll('.moment-card').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openMomentModal(id);
+            });
+        });
+    }
+
+    function renderReferences() {
+        const grid = document.getElementById('referencesGrid');
+        if (!data.references.length) {
+            grid.innerHTML =
+                `<p style="color:var(--text-muted);grid-column:1/-1;text-align:center;padding:40px 0;">Nenhuma referência.</p>`;
+            return;
+        }
+        grid.innerHTML = data.references.map(r => `
+                <div class="reference-item" data-id="${r.id}">
+                    <div class="img-wrap">
+                        <img src="${r.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'300\' height=\'200\' viewBox=\'0 0 300 200\'%3E%3Crect width=\'300\' height=\'200\' fill=\'%231a3045\'/%3E%3Ctext x=\'150\' y=\'110\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'14\' font-family=\'sans-serif\'%3EReferência%3C/text%3E%3C/svg%3E'}" alt="Referência" />
+                    </div>
+                    <div class="info">
+                        <div class="tag">${r.tag || ''}</div>
+                        <div class="note">${r.note}</div>
+                    </div>
+                    <div class="card-actions">
+                        <button data-action="edit-reference" data-id="${r.id}">✎</button>
+                        <button data-action="delete-reference" data-id="${r.id}">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        grid.querySelectorAll('.reference-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.card-actions')) return;
+                const id = el.dataset.id;
+                openReferenceModal(id);
+            });
+        });
+    }
+
+    function renderSoundtrack() {
+        const list = document.getElementById('soundtrackList');
+        if (!data.soundtrack.length) {
+            list.innerHTML =
+                `<p style="color:var(--text-muted);text-align:center;padding:30px 0;">Nenhuma música adicionada.</p>`;
+            return;
+        }
+        list.innerHTML = data.soundtrack.map(s => `
+                <div class="soundtrack-item" data-id="${s.id}">
+                    <div class="name">${s.name}</div>
+                    <div class="desc">${s.description}</div>
+                    <div class="moment">${s.moment}</div>
+                    <div class="link">${s.link ? `<a href="${s.link}" target="_blank">🔗 ouvir</a>` : ''}</div>
+                    <div class="actions">
+                        <button data-action="edit-soundtrack" data-id="${s.id}">✎</button>
+                        <button data-action="delete-soundtrack" data-id="${s.id}">✕</button>
+                    </div>
+                </div>
+            `).join('');
+
+        list.querySelectorAll('.soundtrack-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.closest('.actions') || e.target.closest('.link')) return;
+                const id = el.dataset.id;
+                openSoundtrackModal(id);
+            });
+        });
+    }
+
+    function renderAtmosphere() {
+        const palette = document.getElementById('colorPalette');
+        palette.innerHTML = data.atmosphere.colors.map(c =>
+            `<div class="color-swatch" style="background:${c};" title="${c}"></div>`
+        ).join('');
+
+        const moodGrid = document.getElementById('moodGrid');
+        moodGrid.innerHTML = data.atmosphere.moods.map(m =>
+            `<div class="mood-item">${m}</div>`
+        ).join('');
+
+        const cloud = document.getElementById('keywordCloud');
+        cloud.innerHTML = data.atmosphere.keywords.map(k =>
+            `<span>${k}</span>`
+        ).join('');
+
+        const emotions = document.getElementById('emotionList');
+        emotions.innerHTML = data.atmosphere.emotions.map(e =>
+            `<span>${e}</span>`
+        ).join('');
+    }
+
+    // ================================================================
+    // MODAIS DE APRESENTAÇÃO (view only)
+    // ================================================================
+
+    function openModal(html) {
+        document.getElementById('modalBody').innerHTML = html;
+        document.getElementById('modalOverlay').classList.add('open');
+    }
+
+    function closeModal() {
+        document.getElementById('modalOverlay').classList.remove('open');
+    }
+
+    function openCharacterModal(id) {
+        const c = data.characters.find(x => x.id === id);
+        if (!c) return;
+        const html = `
+                <h2>${c.name}</h2>
+                <div class="sub">${c.role}</div>
+                <div class="modal-img">
+                    <img src="${c.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3E${c.name}%3C/text%3E%3C/svg%3E'}" alt="${c.name}" />
+                </div>
+                <div class="modal-body">
+                    <p><strong>Descrição:</strong> ${c.fullDesc || c.description}</p>
+                    <span class="label">Idade</span><p>${c.age || '—'}</p>
+                    <span class="label">Personalidade</span><p>${c.personality || '—'}</p>
+                    <span class="label">Curiosidades</span><p>${c.curiosities || '—'}</p>
+                    <span class="label">História</span><p>${c.history || '—'}</p>
+                    <span class="label">Objetivos</span><p>${c.goals || '—'}</p>
+                    <span class="label">Relações</span><p>${c.relations || '—'}</p>
+                    <span class="label">Links para artes / sprites</span><p>${c.links || '—'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-character" data-id="${c.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-character" data-id="${c.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openLocationModal(id) {
+        const l = data.locations.find(x => x.id === id);
+        if (!l) return;
+        const html = `
+                <h2>${l.name}</h2>
+                <div class="sub">${l.chapters || ''}</div>
+                <div class="modal-img">
+                    <img src="${l.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3E${l.name}%3C/text%3E%3C/svg%3E'}" alt="${l.name}" />
+                </div>
+                <div class="modal-body">
+                    <p><strong>Descrição:</strong> ${l.description}</p>
+                    <span class="label">História do Local</span><p>${l.history || '—'}</p>
+                    <span class="label">Importância Narrativa</span><p>${l.importance || '—'}</p>
+                    <span class="label">Personagens Presentes</span><p>${l.characters || '—'}</p>
+                    <span class="label">Objetos Importantes</span><p>${l.objects || '—'}</p>
+                    <span class="label">Artes</span><p>${l.arts || '—'}</p>
+                    <span class="label">Músicas</span><p>${l.music || '—'}</p>
+                    <span class="label">Curiosidades</span><p>${l.curiosities || '—'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-location" data-id="${l.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-location" data-id="${l.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openTimelineModal(id) {
+        const t = data.timeline.find(x => x.id === id);
+        if (!t) return;
+        const html = `
+                <h2>${t.title}</h2>
+                <div class="sub">${t.date || ''} · ${t.chapter || ''}</div>
+                <div class="modal-img">
+                    <img src="${t.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3E${t.title}%3C/text%3E%3C/svg%3E'}" alt="${t.title}" />
+                </div>
+                <div class="modal-body">
+                    <p>${t.description}</p>
+                    <span class="label">Data</span><p>${t.date || '—'}</p>
+                    <span class="label">Capítulo</span><p>${t.chapter || '—'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-timeline" data-id="${t.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-timeline" data-id="${t.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openArtModal(id) {
+        const a = data.artworks.find(x => x.id === id);
+        if (!a) return;
+        const html = `
+                <h2>${a.title}</h2>
+                <div class="sub">${a.category}</div>
+                <div class="modal-img">
+                    <img src="${a.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3E${a.title}%3C/text%3E%3C/svg%3E'}" alt="${a.title}" />
+                </div>
+                <div class="modal-body">
+                    <p>${a.desc || 'Sem descrição adicional.'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-art" data-id="${a.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-art" data-id="${a.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openMainCharModal(id) {
+        const m = data.mainCharacters.find(x => x.id === id);
+        if (!m) return;
+        const html = `
+                <h2>${m.name}</h2>
+                <div class="sub">Personagem principal</div>
+                <div class="modal-img">
+                    <img src="${m.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3E${m.name}%3C/text%3E%3C/svg%3E'}" alt="${m.name}" />
+                </div>
+                <div class="modal-body">
+                    <p><strong>Biografia:</strong> ${m.bio}</p>
+                    <span class="label">Cor temática</span><p style="display:flex;gap:8px;align-items:center;"><span style="display:inline-block;width:30px;height:30px;border-radius:8px;background:${m.color || '#4c8b9c'};"></span> ${m.color || '#4c8b9c'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-mainchar" data-id="${m.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-mainchar" data-id="${m.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openMomentModal(id) {
+        const m = data.moments.find(x => x.id === id);
+        if (!m) return;
+        const html = `
+                <h2>${m.title}</h2>
+                <div class="sub">${m.chapter || ''}</div>
+                <div class="modal-img">
+                    <img src="${m.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3E${m.title}%3C/text%3E%3C/svg%3E'}" alt="${m.title}" />
+                </div>
+                <div class="modal-body">
+                    <p>${m.description}</p>
+                    <span class="label">Capítulo</span><p>${m.chapter || '—'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-moment" data-id="${m.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-moment" data-id="${m.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openReferenceModal(id) {
+        const r = data.references.find(x => x.id === id);
+        if (!r) return;
+        const html = `
+                <h2>Referência</h2>
+                <div class="sub">${r.tag || ''}</div>
+                <div class="modal-img">
+                    <img src="${r.image || 'data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' width=\'400\' height=\'300\' viewBox=\'0 0 400 300\'%3E%3Crect width=\'400\' height=\'300\' fill=\'%231a3045\'/%3E%3Ctext x=\'200\' y=\'160\' text-anchor=\'middle\' fill=\'%238aaec9\' font-size=\'18\' font-family=\'sans-serif\'%3EReferência%3C/text%3E%3C/svg%3E'}" alt="Referência" />
+                </div>
+                <div class="modal-body">
+                    <p>${r.note}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-reference" data-id="${r.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-reference" data-id="${r.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    function openSoundtrackModal(id) {
+        const s = data.soundtrack.find(x => x.id === id);
+        if (!s) return;
+        const html = `
+                <h2>${s.name}</h2>
+                <div class="sub">Trilha sonora</div>
+                <div class="modal-body">
+                    <p><strong>Descrição:</strong> ${s.description}</p>
+                    <span class="label">Momento em que toca</span><p>${s.moment || '—'}</p>
+                    <span class="label">Link</span><p>${s.link ? `<a href="${s.link}" target="_blank" style="color:var(--accent-warm);">${s.link}</a>` : '—'}</p>
+                    <span class="label">Observações</span><p>${s.notes || '—'}</p>
+                </div>
+                <div class="modal-actions">
+                    <button data-action="edit-soundtrack" data-id="${s.id}">✎ Editar</button>
+                    <button class="danger" data-action="delete-soundtrack" data-id="${s.id}">🗑 Remover</button>
+                </div>
+            `;
+        openModal(html);
+    }
+
+    // ================================================================
+    // FORM MODAIS (CRUD) — com upload de arquivo
+    // ================================================================
+
+    function setupFileUpload(formId, textFieldId, fileInputId) {
+        const fileInput = document.getElementById(fileInputId);
+        const textField = document.getElementById(textFieldId);
+        if (fileInput && textField) {
+            fileInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    textField.value = ev.target.result;
+                };
+                reader.readAsDataURL(file);
+            });
+            // Botão para abrir seletor
+            const btn = document.querySelector(`[data-file-btn="${fileInputId}"]`);
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    fileInput.click();
+                });
+            }
+        }
+    }
+
+    function showCharacterForm(dataItem, isEdit) {
+        const c = dataItem || { name: '', role: '', description: '', image: '', fullDesc: '', age: '', personality: '',
+            curiosities: '', history: '', goals: '', relations: '', links: '' };
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Novo'} personagem</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Nome</label><input type="text" id="f_name" value="${c.name || ''}" /></div>
+                    <div class="form-group"><label>Função</label><input type="text" id="f_role" value="${c.role || ''}" /></div>
+                    <div class="form-group"><label>Descrição curta</label><input type="text" id="f_desc" value="${c.description || ''}" /></div>
+                    <div class="form-group"><label>Imagem</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${c.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Descrição completa</label><textarea id="f_fullDesc">${c.fullDesc || ''}</textarea></div>
+                    <div class="form-row"><div class="form-group"><label>Idade</label><input type="text" id="f_age" value="${c.age || ''}" /></div>
+                    <div class="form-group"><label>Personalidade</label><input type="text" id="f_personality" value="${c.personality || ''}" /></div></div>
+                    <div class="form-group"><label>Curiosidades</label><textarea id="f_curiosities">${c.curiosities || ''}</textarea></div>
+                    <div class="form-group"><label>História</label><textarea id="f_history">${c.history || ''}</textarea></div>
+                    <div class="form-group"><label>Objetivos</label><textarea id="f_goals">${c.goals || ''}</textarea></div>
+                    <div class="form-group"><label>Relações</label><textarea id="f_relations">${c.relations || ''}</textarea></div>
+                    <div class="form-group"><label>Links para artes/sprites</label><input type="text" id="f_links" value="${c.links || ''}" /></div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveCharacterForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveCharacterForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveCharacterForm').addEventListener('click', () => {
+            const obj = {
+                name: document.getElementById('f_name').value.trim() || 'Sem nome',
+                role: document.getElementById('f_role').value.trim(),
+                description: document.getElementById('f_desc').value.trim(),
+                image: document.getElementById('f_image').value.trim(),
+                fullDesc: document.getElementById('f_fullDesc').value.trim(),
+                age: document.getElementById('f_age').value.trim(),
+                personality: document.getElementById('f_personality').value.trim(),
+                curiosities: document.getElementById('f_curiosities').value.trim(),
+                history: document.getElementById('f_history').value.trim(),
+                goals: document.getElementById('f_goals').value.trim(),
+                relations: document.getElementById('f_relations').value.trim(),
+                links: document.getElementById('f_links').value.trim()
+            };
+            if (isEdit && c.id) {
+                const idx = data.characters.findIndex(x => x.id === c.id);
+                if (idx > -1) { data.characters[idx] = { ...data.characters[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.characters.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    function showLocationForm(dataItem, isEdit) {
+        const l = dataItem || { name: '', description: '', image: '', chapters: '', history: '', importance: '',
+            characters: '', objects: '', arts: '', music: '', curiosities: '' };
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Novo'} local</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Nome</label><input type="text" id="f_name" value="${l.name || ''}" /></div>
+                    <div class="form-group"><label>Descrição breve</label><input type="text" id="f_desc" value="${l.description || ''}" /></div>
+                    <div class="form-group"><label>Imagem</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${l.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Capítulos</label><input type="text" id="f_chapters" value="${l.chapters || ''}" /></div>
+                    <div class="form-group"><label>História</label><textarea id="f_history">${l.history || ''}</textarea></div>
+                    <div class="form-group"><label>Importância Narrativa</label><textarea id="f_importance">${l.importance || ''}</textarea></div>
+                    <div class="form-group"><label>Personagens presentes</label><input type="text" id="f_characters" value="${l.characters || ''}" /></div>
+                    <div class="form-group"><label>Objetos importantes</label><input type="text" id="f_objects" value="${l.objects || ''}" /></div>
+                    <div class="form-group"><label>Artes</label><input type="text" id="f_arts" value="${l.arts || ''}" /></div>
+                    <div class="form-group"><label>Músicas</label><input type="text" id="f_music" value="${l.music || ''}" /></div>
+                    <div class="form-group"><label>Curiosidades</label><textarea id="f_curiosities">${l.curiosities || ''}</textarea></div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveLocationForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveLocationForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveLocationForm').addEventListener('click', () => {
+            const obj = {
+                name: document.getElementById('f_name').value.trim() || 'Sem nome',
+                description: document.getElementById('f_desc').value.trim(),
+                image: document.getElementById('f_image').value.trim(),
+                chapters: document.getElementById('f_chapters').value.trim(),
+                history: document.getElementById('f_history').value.trim(),
+                importance: document.getElementById('f_importance').value.trim(),
+                characters: document.getElementById('f_characters').value.trim(),
+                objects: document.getElementById('f_objects').value.trim(),
+                arts: document.getElementById('f_arts').value.trim(),
+                music: document.getElementById('f_music').value.trim(),
+                curiosities: document.getElementById('f_curiosities').value.trim()
+            };
+            if (isEdit && l.id) {
+                const idx = data.locations.findIndex(x => x.id === l.id);
+                if (idx > -1) { data.locations[idx] = { ...data.locations[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.locations.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    function showTimelineForm(dataItem, isEdit) {
+        const t = dataItem || { title: '', description: '', date: '', chapter: '', image: '' };
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Novo'} evento</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Título</label><input type="text" id="f_title" value="${t.title || ''}" /></div>
+                    <div class="form-group"><label>Descrição</label><textarea id="f_desc">${t.description || ''}</textarea></div>
+                    <div class="form-group"><label>Data</label><input type="text" id="f_date" value="${t.date || ''}" /></div>
+                    <div class="form-group"><label>Capítulo</label><input type="text" id="f_chapter" value="${t.chapter || ''}" /></div>
+                    <div class="form-group"><label>Imagem</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${t.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveTimelineForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveTimelineForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveTimelineForm').addEventListener('click', () => {
+            const obj = {
+                title: document.getElementById('f_title').value.trim() || 'Evento',
+                description: document.getElementById('f_desc').value.trim(),
+                date: document.getElementById('f_date').value.trim(),
+                chapter: document.getElementById('f_chapter').value.trim(),
+                image: document.getElementById('f_image').value.trim()
+            };
+            if (isEdit && t.id) {
+                const idx = data.timeline.findIndex(x => x.id === t.id);
+                if (idx > -1) { data.timeline[idx] = { ...data.timeline[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.timeline.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    function showArtForm(dataItem, isEdit) {
+        const a = dataItem || { title: '', category: 'Concept', image: '', desc: '' };
+        const categories = ['Concept', 'Personagem', 'Cenário', 'Objeto', 'Ilustração'];
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Nova'} arte</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Título</label><input type="text" id="f_title" value="${a.title || ''}" /></div>
+                    <div class="form-group"><label>Categoria</label>
+                        <select id="f_category">${categories.map(c => `<option value="${c}" ${c===a.category?'selected':''}>${c}</option>`).join('')}</select>
+                    </div>
+                    <div class="form-group"><label>Imagem</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${a.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                    <div class="form-group"><label>Descrição</label><textarea id="f_desc">${a.desc || ''}</textarea></div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveArtForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveArtForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveArtForm').addEventListener('click', () => {
+            const obj = {
+                title: document.getElementById('f_title').value.trim() || 'Arte',
+                category: document.getElementById('f_category').value,
+                image: document.getElementById('f_image').value.trim(),
+                desc: document.getElementById('f_desc').value.trim()
+            };
+            if (isEdit && a.id) {
+                const idx = data.artworks.findIndex(x => x.id === a.id);
+                if (idx > -1) { data.artworks[idx] = { ...data.artworks[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.artworks.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    function showMainCharForm(dataItem, isEdit) {
+        const m = dataItem || { name: '', color: '#4c8b9c', bio: '', image: '' };
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Novo'} personagem principal</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Nome</label><input type="text" id="f_name" value="${m.name || ''}" /></div>
+                    <div class="form-group"><label>Cor temática</label><input type="text" id="f_color" value="${m.color || '#4c8b9c'}" /></div>
+                    <div class="form-group"><label>Biografia</label><input type="text" id="f_bio" value="${m.bio || ''}" /></div>
+                    <div class="form-group"><label>Retrato</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${m.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveMainCharForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveMainCharForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveMainCharForm').addEventListener('click', () => {
+            const obj = {
+                name: document.getElementById('f_name').value.trim() || 'Sem nome',
+                color: document.getElementById('f_color').value.trim() || '#4c8b9c',
+                bio: document.getElementById('f_bio').value.trim(),
+                image: document.getElementById('f_image').value.trim()
+            };
+            if (isEdit && m.id) {
+                const idx = data.mainCharacters.findIndex(x => x.id === m.id);
+                if (idx > -1) { data.mainCharacters[idx] = { ...data.mainCharacters[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.mainCharacters.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    function showMomentForm(dataItem, isEdit) {
+        const m = dataItem || { title: '', description: '', chapter: '', image: '' };
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Novo'} momento</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Título</label><input type="text" id="f_title" value="${m.title || ''}" /></div>
+                    <div class="form-group"><label>Descrição</label><textarea id="f_desc">${m.description || ''}</textarea></div>
+                    <div class="form-group"><label>Capítulo</label><input type="text" id="f_chapter" value="${m.chapter || ''}" /></div>
+                    <div class="form-group"><label>Imagem</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${m.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveMomentForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveMomentForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveMomentForm').addEventListener('click', () => {
+            const obj = {
+                title: document.getElementById('f_title').value.trim() || 'Momento',
+                description: document.getElementById('f_desc').value.trim(),
+                chapter: document.getElementById('f_chapter').value.trim(),
+                image: document.getElementById('f_image').value.trim()
+            };
+            if (isEdit && m.id) {
+                const idx = data.moments.findIndex(x => x.id === m.id);
+                if (idx > -1) { data.moments[idx] = { ...data.moments[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.moments.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    function showReferenceForm(dataItem, isEdit) {
+        const r = dataItem || { note: '', tag: '', image: '' };
+        const html = `
+                <h2>${isEdit ? 'Editar' : 'Nova'} referência</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>Anotação</label><textarea id="f_note">${r.note || ''}</textarea></div>
+                    <div class="form-group"><label>Tag</label><input type="text" id="f_tag" value="${r.tag || ''}" /></div>
+                    <div class="form-group"><label>Imagem</label>
+                        <div class="file-upload-wrapper">
+                            <input type="text" id="f_image" value="${r.image || ''}" placeholder="URL ou Base64" />
+                            <input type="file" accept="image/*" id="f_image_upload" />
+                            <button class="file-btn" data-file-btn="f_image_upload">📁 Escolher arquivo</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="saveReferenceForm">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        setupFileUpload('saveReferenceForm', 'f_image', 'f_image_upload');
+        document.getElementById('saveReferenceForm').addEventListener('click', () => {
+            const obj = {
+                note: document.getElementById('f_note').value.trim(),
+                tag: document.getElementById('f_tag').value.trim(),
+                image: document.getElementById('f_image').value.trim()
+            };
+            if (isEdit && r.id) {
+                const idx = data.references.findIndex(x => x.id === r.id);
+                if (idx > -1) { data.references[idx] = { ...data.references[idx], ...obj }; }
+            } else {
+                obj.id = generateId();
+                data.references.push(obj);
+            }
+            saveData();
+            renderAll();
+            closeModal();
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    }
+
+    // ================================================================
+    // EVENT HANDLING
+    // ================================================================
+
+    function handleGlobalClicks(e) {
+        const target = e.target.closest('[data-action]');
+        if (!target) return;
+
+        const action = target.dataset.action;
+        const id = target.dataset.id;
+
+        if (action === 'edit-character') {
+            const c = data.characters.find(x => x.id === id);
+            if (c) { closeModal();
+                setTimeout(() => showCharacterForm(c, true), 100); }
+            return;
+        }
+        if (action === 'delete-character') {
+            if (confirm('Remover este personagem?')) {
+                data.characters = data.characters.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'edit-location') {
+            const l = data.locations.find(x => x.id === id);
+            if (l) { closeModal();
+                setTimeout(() => showLocationForm(l, true), 100); }
+            return;
+        }
+        if (action === 'delete-location') {
+            if (confirm('Remover este local?')) {
+                data.locations = data.locations.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'edit-timeline') {
+            const t = data.timeline.find(x => x.id === id);
+            if (t) { closeModal();
+                setTimeout(() => showTimelineForm(t, true), 100); }
+            return;
+        }
+        if (action === 'delete-timeline') {
+            if (confirm('Remover este evento?')) {
+                data.timeline = data.timeline.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+        if (action === 'move-up') {
+            const idx = data.timeline.findIndex(x => x.id === id);
+            if (idx > 0) { [data.timeline[idx], data.timeline[idx - 1]] = [data.timeline[idx - 1], data.timeline[idx]];
+                saveData();
+                renderAll(); }
+            return;
+        }
+        if (action === 'move-down') {
+            const idx = data.timeline.findIndex(x => x.id === id);
+            if (idx < data.timeline.length - 1) { [data.timeline[idx], data.timeline[idx + 1]] = [data.timeline[idx + 1],
+                    data.timeline[idx]
+                ];
+                saveData();
+                renderAll(); }
+            return;
+        }
+
+        if (action === 'edit-art') {
+            const a = data.artworks.find(x => x.id === id);
+            if (a) { closeModal();
+                setTimeout(() => showArtForm(a, true), 100); }
+            return;
+        }
+        if (action === 'delete-art') {
+            if (confirm('Remover esta arte?')) {
+                data.artworks = data.artworks.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'edit-mainchar') {
+            const m = data.mainCharacters.find(x => x.id === id);
+            if (m) { closeModal();
+                setTimeout(() => showMainCharForm(m, true), 100); }
+            return;
+        }
+        if (action === 'delete-mainchar') {
+            if (confirm('Remover este personagem principal?')) {
+                data.mainCharacters = data.mainCharacters.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'edit-moment') {
+            const m = data.moments.find(x => x.id === id);
+            if (m) { closeModal();
+                setTimeout(() => showMomentForm(m, true), 100); }
+            return;
+        }
+        if (action === 'delete-moment') {
+            if (confirm('Remover este momento?')) {
+                data.moments = data.moments.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'edit-reference') {
+            const r = data.references.find(x => x.id === id);
+            if (r) { closeModal();
+                setTimeout(() => showReferenceForm(r, true), 100); }
+            return;
+        }
+        if (action === 'delete-reference') {
+            if (confirm('Remover esta referência?')) {
+                data.references = data.references.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'edit-soundtrack') {
+            const s = data.soundtrack.find(x => x.id === id);
+            if (s) { closeModal();
+                setTimeout(() => showSoundtrackForm(s, true), 100); }
+            return;
+        }
+        if (action === 'delete-soundtrack') {
+            if (confirm('Remover esta música?')) {
+                data.soundtrack = data.soundtrack.filter(x => x.id !== id);
+                saveData();
+                renderAll();
+                closeModal();
+            }
+            return;
+        }
+
+        if (action === 'view-timeline') {
+            openTimelineModal(id);
+            return;
+        }
+    }
+
+    // ================================================================
+    // INLINE EDITING — Hero e About
+    // ================================================================
+
+    function setupInlineEditing() {
+        // Hero
+        document.getElementById('heroTitle').addEventListener('blur', function() {
+            data.hero.title = this.textContent.trim() || 'Vila dos Ventos';
+            saveData();
+            renderHero();
+        });
+        document.getElementById('heroSubtitle').addEventListener('blur', function() {
+            data.hero.subtitle = this.textContent.trim();
+            saveData();
+        });
+        document.getElementById('heroSlogan').addEventListener('blur', function() {
+            data.hero.slogan = this.textContent.trim();
+            saveData();
+        });
+        document.getElementById('heroGenre').addEventListener('blur', function() {
+            data.hero.genre = this.textContent.trim() || 'Aventura · Cotidiano';
+            data.hero.genreLabel = this.textContent.trim();
+            saveData();
+            renderHero();
+        });
+        document.getElementById('heroGenreLabel').addEventListener('blur', function() {
+            data.hero.genre = this.textContent.trim() || 'Aventura · Cotidiano';
+            saveData();
+            renderHero();
+        });
+        document.getElementById('heroStatus').addEventListener('blur', function() {
+            data.hero.status = this.textContent.trim() || 'Em desenvolvimento';
+            saveData();
+            renderHero();
+        });
+        document.getElementById('heroDesc').addEventListener('blur', function() {
+            data.hero.description = this.textContent.trim();
+            saveData();
+        });
+
+        // About
+        document.getElementById('aboutSynopsis').addEventListener('blur', function() {
+            data.about.synopsis = this.textContent.trim();
+            saveData();
+        });
+        document.getElementById('aboutPremise').addEventListener('blur', function() {
+            data.about.premise = this.textContent.trim();
+            saveData();
+        });
+        document.getElementById('aboutMessage').addEventListener('blur', function() {
+            data.about.message = this.textContent.trim();
+            saveData();
+        });
+        document.getElementById('aboutAtmo').addEventListener('blur', function() {
+            data.about.atmo = this.textContent.trim();
+            saveData();
+        });
+
+        // Section Titles
+        document.querySelectorAll('.section-title[data-section]').forEach(el => {
+            el.addEventListener('blur', function() {
+                const key = this.dataset.section;
+                const val = this.textContent.trim();
+                if (val) {
+                    data.sectionTitles[key] = val;
+                    saveData();
+                }
+            });
+        });
+    }
+
+    // ================================================================
+    // RENDER ALL
+    // ================================================================
+
+    function renderAll() {
+        renderHero();
+        renderAbout();
+        renderSectionTitles();
+        renderCharacters();
+        renderLocations();
+        renderTimeline();
+        renderArtGallery(currentArtFilter);
+        renderMainCharacters();
+        renderMoments();
+        renderReferences();
+        renderSoundtrack();
+        renderAtmosphere();
+    }
+
+    let currentArtFilter = 'all';
+
+    // ================================================================
+    // INIT
+    // ================================================================
+
+    loadData();
+
+    document.querySelectorAll('#artFilters button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('#artFilters button').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentArtFilter = btn.dataset.filter;
+            renderArtGallery(currentArtFilter);
+        });
+    });
+
+    document.getElementById('heroUpload').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => {
+            data.hero.cover = ev.target.result;
+            saveData();
+            renderHero();
+        };
+        reader.readAsDataURL(file);
+        this.value = '';
+    });
+
+    document.querySelector('[data-edit="hero"]').addEventListener('click', () => {
+        const html = `
+                <h2>Trocar imagem de capa</h2>
+                <div class="modal-body">
+                    <div class="form-group"><label>URL da imagem (ou Base64)</label>
+                        <input type="text" id="f_cover" value="${data.hero.cover || ''}" placeholder="https://... ou data:image/..." />
+                    </div>
+                    <p style="color:var(--text-muted);font-size:0.8rem;">Ou faça upload:</p>
+                    <input type="file" accept="image/*" id="f_coverUpload" />
+                </div>
+                <div class="modal-actions">
+                    <button id="saveCover">💾 Salvar</button>
+                    <button id="cancelForm">Cancelar</button>
+                </div>
+            `;
+        openModal(html);
+        document.getElementById('f_coverUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                document.getElementById('f_cover').value = ev.target.result;
+            };
+            reader.readAsDataURL(file);
+        });
+        document.getElementById('saveCover').addEventListener('click', () => {
+            const val = document.getElementById('f_cover').value.trim();
+            if (val) { data.hero.cover = val;
+                saveData();
+                renderAll();
+                closeModal(); }
+        });
+        document.getElementById('cancelForm').addEventListener('click', closeModal);
+    });
+
+    document.getElementById('addCharacter').addEventListener('click', () => showCharacterForm(null, false));
+    document.getElementById('addLocation').addEventListener('click', () => showLocationForm(null, false));
+    document.getElementById('addTimelineEvent').addEventListener('click', () => showTimelineForm(null, false));
+    document.getElementById('addArt').addEventListener('click', () => showArtForm(null, false));
+    document.getElementById('addMainCharacter').addEventListener('click', () => showMainCharForm(null, false));
+    document.getElementById('addMoment').addEventListener('click', () => showMomentForm(null, false));
+    document.getElementById('addReference').addEventListener('click', () => showReferenceForm(null, false));
+    document.getElementById('addSoundtrack').addEventListener('click', () => showSoundtrackForm(null, false));
+
+    document.getElementById('addColor').addEventListener('click', () => {
+        const val = prompt('Digite a cor (ex: #4c8b9c, rgb(76,139,156)):');
+        if (val) { data.atmosphere.colors.push(val);
+            saveData();
+            renderAll(); }
+    });
+    document.getElementById('addMood').addEventListener('click', () => {
+        const val = prompt('Digite o mood:');
+        if (val) { data.atmosphere.moods.push(val);
+            saveData();
+            renderAll(); }
+    });
+    document.getElementById('addKeyword').addEventListener('click', () => {
+        const val = prompt('Digite a palavra-chave:');
+        if (val) { data.atmosphere.keywords.push(val);
+            saveData();
+            renderAll(); }
+    });
+    document.getElementById('addEmotion').addEventListener('click', () => {
+        const val = prompt('Digite a emoção ou sensação:');
+        if (val) { data.atmosphere.emotions.push(val);
+            saveData();
+            renderAll(); }
+    });
+
+    document.getElementById('modalClose').addEventListener('click', closeModal);
+    document.getElementById('modalOverlay').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) closeModal();
+    });
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+    document.addEventListener('click', handleGlobalClicks);
+
+    setupInlineEditing();
+
+    renderAll();
+
+    console.log('🌊 Vila dos Ventos — Dashboard Costeiro');
+    console.log('📸 Upload de imagens por arquivo em todas as seções.');
+    console.log('🎨 Paleta de cores inspirada no mar e na areia.');
+</script>
+
+</body>
+</html>
